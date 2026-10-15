@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BirthdayTimeMachine.Test/BirthdayTimeMachine.Test.csproj" />
+  <Project Path="BirthdayTimeMachine/BirthdayTimeMachine.csproj" />
+</Solution>
