@@ -1,6 +1,7 @@
 ﻿@page "/birthday"
 @using BirthdayTimeMachine.Models
 @using BirthdayTimeMachine.Services.Interfaces
+@using BirthdayTimeMachine.Helpers
 @inject IGeocodingService GeocodingService
 @inject IWeatherHistoryService WeatherService
 
@@ -53,7 +54,8 @@
             High: @weather.MaxTemperature °C, Low: @weather.MinTemperature °C<br />
             Rain: @weather.Precipitation mm<br />
             Max wind: @weather.MaxWindSpeed km/h<br />
-            Weather code: @weather.WeatherCode
+            <i class="bi @WeatherCodeMapper.GetIconClass(weather.WeatherCode) fs-4 me-1"></i>
+            @WeatherCodeMapper.GetDescription(weather.WeatherCode)
         </p>
     </div>
 }
