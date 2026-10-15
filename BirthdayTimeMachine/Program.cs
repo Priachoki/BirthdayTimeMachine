@@ -1,4 +1,6 @@
 using BirthdayTimeMachine.Components;
+using BirthdayTimeMachine.Services;
+using BirthdayTimeMachine.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Geocoding API - city name to coordinates
+builder.Services.AddHttpClient<IGeocodingService, GeocodingService>(client =>
+{
+    client.BaseAddress = new Uri("https://geocoding-api.open-meteo.com/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
