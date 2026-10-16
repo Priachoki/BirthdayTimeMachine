@@ -1,0 +1,120 @@
+﻿@page "/birthday"
+@using BirthdayTimeMachine.Models
+@using BirthdayTimeMachine.Services.Interfaces
+@using BirthdayTimeMachine.Helpers
+@inject IGeocodingService GeocodingService
+@inject IWeatherHistoryService WeatherService
+
+<PageTitle>Birthday Report</PageTitle>
+
+<h1>Birthday Time Machine</h1>
+
+<div class="mb-3" style="max-width: 400px;">
+    <label class="form-label">City you were born in</label>
+    <input class="form-control" @bind="cityInput" placeholder="e.g. Dublin" />
+</div>
+
+<div class="mb-3" style="max-width: 400px;">
+    <label class="form-label">Date of birth</label>
+    <input type="date" class="form-control" @bind="birthDate" />
+</div>
+
+<button class="btn btn-primary" @onclick="FindCity" disabled="@isLoading">
+    Show my birthday
+</button>
+
+@if (isLoading)
+{
+    <div class="spinner-border text-primary mt-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3">@errorMessage</div>
+}
+
+@if (location != null)
+{
+    <div class="alert alert-success mt-3">
+        <h5>@location.DisplayName</h5>
+        <p class="mb-0">
+            Latitude: @location.Latitude, Longitude: @location.Longitude<br />
+            Country code: @location.CountryCode
+        </p>
+    </div>
+}
+
+@if (weather != null)
+{
+    <div class="alert alert-info mt-3">
+        <h5>Weather on @weather.Date.ToString("dddd, d MMMM yyyy")</h5>
+        <p class="mb-0">
+            High: @weather.MaxTemperature °C, Low: @weather.MinTemperature °C<br />
+            Rain: @weather.Precipitation mm<br />
+            Max wind: @weather.MaxWindSpeed km/h<br />
+            <i class="bi @WeatherCodeMapper.GetIconClass(weather.WeatherCode) fs-4 me-1"></i>
+            @WeatherCodeMapper.GetDescription(weather.WeatherCode)
+        </p>
+    </div>
+}
+
+@code {
+    private string cityInput = string.Empty;
+    private DateOnly birthDate = new DateOnly(2000, 1, 1);
+    private GeocodingResult? location;
+    private WeatherDay? weather;
+    private string? errorMessage;
+    private bool isLoading;
+
+    private async Task FindCity()
+    {
+        errorMessage = null;
+        location = null;
+        weather = null;
+        isLoading = true;
+
+        try
+        {
+            location = await GeocodingService.GetLocationAsync(cityInput);
+
+            if (location == null)
+            {
+                errorMessage = $"We couldn't find \"{cityInput}\". Check the spelling and try again.";
+                return;
+            }
+
+            weather = await WeatherService.GetWeatherForDateAsync(location.Latitude, location.Longitude, birthDate);
+
+            if (weather == null)
+            {
+                errorMessage = "No weather data was found for that date.";
+            }
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            errorMessage = ex.Message.Split(" (Parameter")[0];
+        }
+        catch (ArgumentException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage = "Couldn't reach the weather service. Check your internet connection.";
+        }
+        catch (TaskCanceledException)
+        {
+            errorMessage = "The service took too long to respond. Please try again.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

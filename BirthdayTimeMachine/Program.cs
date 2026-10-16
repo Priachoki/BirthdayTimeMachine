@@ -1,10 +1,26 @@
 using BirthdayTimeMachine.Components;
+using BirthdayTimeMachine.Services;
+using BirthdayTimeMachine.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Geocoding API - city name to coordinates
+builder.Services.AddHttpClient<IGeocodingService, GeocodingService>(client =>
+{
+    client.BaseAddress = new Uri("https://geocoding-api.open-meteo.com/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+
+// Historical weather API - weather for a past date
+builder.Services.AddHttpClient<IWeatherHistoryService, WeatherHistoryService>(client =>
+{
+    client.BaseAddress = new Uri("https://archive-api.open-meteo.com/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 
 var app = builder.Build();
 
