@@ -30,6 +30,14 @@ builder.Services.AddHttpClient<IOnThisDayService, OnThisDayService>(client =>
     client.DefaultRequestHeaders.UserAgent.ParseAdd("BirthdayTimeMachine/1.0 (college student project)");
 });
 
+// NASA Astronomy Picture of the Day
+builder.Services.AddHttpClient<INasaApodService, NasaApodService>(client =>
+{
+    client.BaseAddress = new Uri("https://science.nasa.gov/");
+    client.Timeout = TimeSpan.FromSeconds(15);
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("BirthdayTimeMachine/1.0 (college student project)");
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

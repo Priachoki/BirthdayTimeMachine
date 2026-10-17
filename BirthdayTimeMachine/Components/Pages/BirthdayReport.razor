@@ -2,9 +2,11 @@
 @using BirthdayTimeMachine.Models
 @using BirthdayTimeMachine.Services.Interfaces
 @using BirthdayTimeMachine.Helpers
+@using BirthdayTimeMachine.Services
 @inject IGeocodingService GeocodingService
 @inject IWeatherHistoryService WeatherService
 @inject IOnThisDayService OnThisDayService
+@inject INasaApodService NasaService
 
 <PageTitle>Birthday Report</PageTitle>
 
@@ -61,6 +63,47 @@
     </div>
 }
 
+@if (spacePicture != null)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Space on your birthday: @spacePicture.Title</h5>
+
+            @if (spacePicture.IsVideo)
+            {
+                <p>
+                    This day's picture is a video.
+                    <a href="@spacePicture.VideoUrl" target="_blank" rel="noopener">Watch it here</a>
+                </p>
+            }
+
+            @if (!string.IsNullOrEmpty(spacePicture.ImageUrl))
+            {
+                <img src="@spacePicture.ImageUrl" alt="@spacePicture.Title" class="img-fluid rounded mb-2" style="max-height: 400px;" />
+            }
+
+            <p class="card-text">@spacePicture.Explanation</p>
+
+            @if (!string.IsNullOrEmpty(spacePicture.Copyright))
+            {
+                <p class="text-muted small mb-0">Image credit: @spacePicture.Copyright</p>
+            }
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(spaceMessage))
+{
+    <div class="alert alert-secondary mt-3">
+        @spaceMessage
+        @if (showNasaLink)
+        {
+            <br />
+            <a href="@NasaApodService.GetOfficialPageUrl(birthDate)" target="_blank" rel="noopener">See it on NASA's website instead</a>
+        }
+    </div>
+}
+
 @if (!string.IsNullOrEmpty(historyError))
 {
     <div class="alert alert-warning mt-3">@historyError</div>
@@ -96,9 +139,13 @@
     private GeocodingResult? location;
     private WeatherDay? weather;
     private OnThisDayResult? history;
+    private SpacePicture? spacePicture;
     private string? historyError;
     private string? errorMessage;
     private bool isLoading;
+    private string? spaceMessage;
+    private bool showNasaLink;
+
 
     private async Task ShowBirthday()
     {
@@ -108,12 +155,16 @@
         weather = null;
         history = null;
         isLoading = true;
+        spaceMessage = null;
+        showNasaLink = false;
+        spacePicture = null;
 
         try
         {
             // one section failing doesn't stop the others
             await LoadLocationAndWeather();
             await LoadHistory();
+            await LoadSpacePicture();
         }
         finally
         {
@@ -184,6 +235,40 @@
         catch (InvalidOperationException ex)
         {
             historyError = ex.Message;
+        }
+    }
+     private async Task LoadSpacePicture()
+    {
+        // check the date first so we don't waste an API call
+        if (!NasaApodService.IsDateAvailable(birthDate))
+        {
+            spaceMessage = $"NASA's Astronomy Picture of the Day started on {NasaApodService.FirstApodDate:d MMMM yyyy}, so there isn't one for this date.";
+            return;
+        }
+
+        try
+        {
+            spacePicture = await NasaService.GetPictureAsync(birthDate);
+
+            if (spacePicture == null)
+            {
+                spaceMessage = "NASA's picture for this day isn't available through their API right now.";
+                showNasaLink = true;
+            }
+        }
+        catch (HttpRequestException)
+        {
+            spaceMessage = "Couldn't reach NASA right now.";
+            showNasaLink = true;
+        }
+        catch (TaskCanceledException)
+        {
+            spaceMessage = "NASA took too long to respond.";
+            showNasaLink = true;
+        }
+        catch (InvalidOperationException ex)
+        {
+            spaceMessage = ex.Message;
         }
     }
 }
