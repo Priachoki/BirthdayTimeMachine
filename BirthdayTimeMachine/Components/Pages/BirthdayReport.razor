@@ -8,6 +8,8 @@
 @inject IOnThisDayService OnThisDayService
 @inject INasaApodService NasaService
 @inject IReportStorageService ReportStorage
+@inject IMovieService MovieDb
+@inject IHolidayService Holidays
 
 <PageTitle>Birthday Report</PageTitle>
 
@@ -108,6 +110,33 @@
     </div>
 }
 
+@if (holiday != null && location != null)
+{
+    <div class="alert alert-warning mt-3">
+        <h5><i class="bi bi-calendar-heart me-1"></i> Public holidays</h5>
+        @if (holiday.IsOnBirthday)
+        {
+            <p class="mb-0">
+                You were born on a public holiday in @location.Country:
+                <strong>@holiday.Holiday.Name</strong> (@holiday.Holiday.LocalName)!
+            </p>
+        }
+        else
+        {
+            <p class="mb-0">
+                Your birthday wasn't a public holiday in @location.Country. The closest one was
+                <strong>@holiday.Holiday.Name</strong>,
+                @Math.Abs(holiday.DaysFromBirthday) day(s) @(holiday.DaysFromBirthday > 0 ? "after" : "before").
+            </p>
+        }
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(holidayMessage))
+{
+    <div class="alert alert-secondary mt-3">@holidayMessage</div>
+}
+
 @if (spacePicture != null)
 {
     <div class="card mt-3">
@@ -147,6 +176,41 @@
             <a href="@NasaApodService.GetOfficialPageUrl(birthDate)" target="_blank" rel="noopener">See it on NASA's website instead</a>
         }
     </div>
+}
+
+@if (!string.IsNullOrEmpty(movieMessage))
+{
+    <div class="alert alert-secondary mt-3">@movieMessage</div>
+}
+
+@if (movies != null && movies.Count > 0)
+{
+    <h3 class="mt-4"><i class="bi bi-film me-1"></i> In cinemas around your birthday</h3>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
+        @foreach (var movie in movies)
+        {
+            <div class="col">
+                <a href="@movie.TmdbUrl" target="_blank" rel="noopener" class="card h-100 text-decoration-none text-reset">
+                    @if (!string.IsNullOrEmpty(movie.PosterUrl))
+                    {
+                        <img src="@movie.PosterUrl" alt="Poster for @movie.Title" class="card-img-top" />
+                    }
+                    else
+                    {
+                        <div class="card-img-top bg-secondary-subtle d-flex align-items-center justify-content-center" style="aspect-ratio: 2 / 3;">No poster</div>
+                    }
+                    <div class="card-body p-2">
+                        <p class="fw-semibold small mb-1">@movie.Title</p>
+                        <p class="small text-muted mb-0">
+                            <i class="bi bi-star-fill text-warning me-1"></i>@movie.RatingText
+                            · @movie.ReleaseDate?.ToString("d MMM yyyy")
+                        </p>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+    <p class="small text-muted mt-2">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
 }
 
 @if (!string.IsNullOrEmpty(historyError))
@@ -194,6 +258,10 @@
     private string nameInput = string.Empty;
     private bool isSaved;
     private string? saveMessage;
+    private List<Movie>? movies;
+    private string? movieMessage;
+    private HolidayResult? holiday;
+    private string? holidayMessage;
 
 
     private async Task ShowBirthday()
@@ -205,10 +273,14 @@
         history = null;
         spaceMessage = null;
         showNasaLink = false;
-                spacePicture = null;
+        spacePicture = null;
         age = null;
         isSaved = false;
         saveMessage = null;
+        movies = null;
+        movieMessage = null;
+        holiday = null;
+        holidayMessage = null;
 
         // check the date before calling any APIs
         DateOnly today = DateOnly.FromDateTime(DateTime.Today);
@@ -225,8 +297,10 @@
         {
             // one section failing doesn't stop the others
             await LoadLocationAndWeather();
-            await LoadHistory();
             await LoadSpacePicture();
+            await LoadHistory();
+            await LoadMovies();
+            await LoadHoliday();
         }
         finally
         {
@@ -315,6 +389,61 @@
         }
     }
 
+        private async Task LoadMovies()
+    {
+        try
+        {
+            movies = await MovieDb.GetMoviesAroundDateAsync(birthDate);
+
+            if (movies.Count == 0)
+            {
+                 movieMessage = "No well-known films were found around your birthday.";
+            }
+        }
+        catch (HttpRequestException)
+        {
+            movieMessage = "Couldn't reach the movie database right now.";
+        }
+        catch (TaskCanceledException)
+        {
+            movieMessage = "The movie database took too long to respond.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            movieMessage = ex.Message;
+        }
+    }
+
+    private async Task LoadHoliday()
+    {
+        // needs the country code from geocoding
+        if (location == null)
+        {
+            return;
+        }
+
+        try
+        {
+            holiday = await Holidays.GetHolidayInfoAsync(birthDate, location.CountryCode);
+
+            if (holiday == null)
+            {
+                holidayMessage = $"Public holiday data isn't available for {location.Country}.";
+            }
+        }
+        catch (HttpRequestException)
+        {
+            holidayMessage = "Couldn't reach the holiday service right now.";
+        }
+        catch (TaskCanceledException)
+        {
+            holidayMessage = "The holiday service took too long to respond.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            holidayMessage = ex.Message;
+        }
+    }
 
     private async Task LoadHistory()
     {
