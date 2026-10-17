@@ -1,0 +1,178 @@
+﻿@page "/saved"
+@using BirthdayTimeMachine.Models
+@using BirthdayTimeMachine.Helpers
+@using BirthdayTimeMachine.Services.Interfaces
+@inject IReportStorageService ReportStorage
+
+<PageTitle>Saved Reports</PageTitle>
+
+<h1>Saved Reports</h1>
+
+@if (isLoading)
+{
+    <div class="spinner-border text-primary mt-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3">@errorMessage</div>
+}
+else if (allReports.Count == 0)
+{
+    <div class="alert alert-light border mt-3">
+        No saved reports yet. <a href="birthday">Make your first birthday report</a>.
+    </div>
+}
+else
+{
+    @* summary worked out with LINQ *@
+    <div class="alert alert-info mt-3">
+        <strong>@allReports.Count</strong> saved report(s).
+        @if (warmest != null)
+        {
+            <span> Warmest birthday: <strong>@warmest.Name</strong> (@warmest.MaxTemperature °C).</span>
+        }
+        @if (coldest != null)
+        {
+            <span> Coldest: <strong>@coldest.Name</strong> (@coldest.MaxTemperature °C).</span>
+        }
+        <span> Rainy birthdays: <strong>@allReports.Count(r => r.WasRainy)</strong>.</span>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <label class="form-label" for="search">Search by name or city</label>
+            <input id="search" class="form-control" @bind="searchText" @bind:event="oninput" placeholder="e.g. Dublin" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="sort">Sort by</label>
+            <select id="sort" class="form-select" @bind="sortOption">
+                <option value="@ReportSortOption.RecentlySaved">Recently saved</option>
+                <option value="@ReportSortOption.OldestBirthday">Oldest birthday first</option>
+                <option value="@ReportSortOption.NewestBirthday">Newest birthday first</option>
+                <option value="@ReportSortOption.Warmest">Warmest birthday</option>
+                <option value="@ReportSortOption.Coldest">Coldest birthday</option>
+                <option value="@ReportSortOption.Name">Name (A–Z)</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="filter">Show</label>
+            <select id="filter" class="form-select" @bind="filter">
+                <option value="@ReportFilter.All">All reports</option>
+                <option value="@ReportFilter.Rainy">Rainy birthdays</option>
+                <option value="@ReportFilter.Dry">Dry birthdays</option>
+                <option value="@ReportFilter.WithSpacePicture">With a NASA picture</option>
+                <option value="@ReportFilter.BornBefore2000">Born before 2000</option>
+            </select>
+        </div>
+    </div>
+
+    @if (VisibleReports.Count == 0)
+    {
+        <p class="text-muted">No reports match your search.</p>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+            @foreach (var report in VisibleReports)
+            {
+                <div class="col">
+                    <div class="card h-100">
+                        @if (!string.IsNullOrEmpty(report.SpaceImageUrl))
+                        {
+                            <img src="@report.SpaceImageUrl" alt="@report.SpaceTitle" class="card-img-top" style="height: 180px; object-fit: cover;" />
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title mb-1">@report.Name</h5>
+                            <p class="text-muted mb-2">
+                                @report.BirthDate.ToString("dddd, d MMMM yyyy") · @report.City
+                            </p>
+
+                            <p class="mb-2">
+                                <i class="bi @WeatherCodeMapper.GetIconClass(report.WeatherCode) me-1"></i>
+                                @WeatherCodeMapper.GetDescription(report.WeatherCode),
+                                @(report.MaxTemperature.HasValue ? $"{report.MaxTemperature} °C" : "no temperature data")
+                            </p>
+
+                            @if (!string.IsNullOrEmpty(report.SpaceTitle))
+                            {
+                                <p class="mb-2"><i class="bi bi-stars me-1"></i> @report.SpaceTitle</p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(report.HighlightEvent))
+                            {
+                                <p class="small mb-2"><i class="bi bi-book me-1"></i> @report.HighlightEvent</p>
+                            }
+
+                            <p class="small text-muted mb-0">Saved @report.SavedAt.ToString("d MMM yyyy, HH:mm")</p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteReport(report.Id)">
+                                <i class="bi bi-trash me-1"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
+
+@code {
+    private List<SavedReport> allReports = new();
+    private SavedReport? warmest;
+    private SavedReport? coldest;
+
+    private string searchText = string.Empty;
+    private ReportSortOption sortOption = ReportSortOption.RecentlySaved;
+    private ReportFilter filter = ReportFilter.All;
+
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    // search, then filter, then sort - recalculated whenever the page re-renders
+    private List<SavedReport> VisibleReports =>
+        ReportQuery.Sort(
+            ReportQuery.Filter(
+                ReportQuery.Search(allReports, searchText),
+                filter),
+            sortOption);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            allReports = await ReportStorage.GetAllAsync();
+            UpdateSummary();
+        }
+        catch (IOException)
+        {
+            errorMessage = "Couldn't load your saved reports.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteReport(Guid id)
+    {
+        try
+        {
+            await ReportStorage.DeleteAsync(id);
+            allReports.RemoveAll(r => r.Id == id);
+            UpdateSummary();
+        }
+        catch (IOException)
+        {
+            errorMessage = "Couldn't delete that report. Please try again.";
+        }
+    }
+
+    private void UpdateSummary()
+    {
+        warmest = ReportQuery.Warmest(allReports);
+        coldest = ReportQuery.Coldest(allReports);
+    }
+}

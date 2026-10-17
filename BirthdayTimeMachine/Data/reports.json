@@ -1,0 +1,50 @@
+[
+  {
+    "Id": "82a67c04-a4fd-4ed6-a2d6-8febd730de68",
+    "Name": "Priyanka Achoki",
+    "BirthDate": "2004-01-01",
+    "City": "Nairobi, Nairobi County, Kenya",
+    "CountryCode": "KE",
+    "MaxTemperature": 24.1,
+    "MinTemperature": 14.8,
+    "Precipitation": 1.6,
+    "MaxWindSpeed": 15.9,
+    "WeatherCode": 53,
+    "SpaceTitle": "Structure in N63A",
+    "SpaceImageUrl": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2004/january/n63a_compcxc_full.jpg?w=576\u0026h=576\u0026fit=clip\u0026crop=faces%2Cfocalpoint",
+    "HighlightEvent": null,
+    "SavedAt": "2026-10-17T16:12:01.0597055+01:00"
+  },
+  {
+    "Id": "95f559ef-c438-4da4-b2df-7d245db59a03",
+    "Name": "John  Doe",
+    "BirthDate": "2003-05-01",
+    "City": "Nairobi, Nairobi County, Kenya",
+    "CountryCode": "KE",
+    "MaxTemperature": 22.4,
+    "MinTemperature": 15.7,
+    "Precipitation": 47.6,
+    "MaxWindSpeed": 4.7,
+    "WeatherCode": 63,
+    "SpaceTitle": "The Energetic Jet from Centaurus A",
+    "SpaceImageUrl": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2003/may/cenajet_cxcnrao_full.jpg?w=720\u0026h=558\u0026fit=clip\u0026crop=faces%2Cfocalpoint",
+    "HighlightEvent": "Invasion of Iraq: In what becomes known as the \u0022Mission Accomplished\u0022 speech, on board the USS\u00A0Abraham Lincoln (off the coast of California), U.S. President George W. Bush declares that \u0022major combat operations in Iraq have ended\u0022.",
+    "SavedAt": "2026-10-17T16:25:38.7754521+01:00"
+  },
+  {
+    "Id": "6714d1fc-541d-46ea-9319-db0cdad62ee9",
+    "Name": "Mary White",
+    "BirthDate": "1994-01-12",
+    "City": "Dublin, Leinster, Ireland",
+    "CountryCode": "IE",
+    "MaxTemperature": 10.2,
+    "MinTemperature": 4.6,
+    "Precipitation": 4.8,
+    "MaxWindSpeed": 36.8,
+    "WeatherCode": 61,
+    "SpaceTitle": null,
+    "SpaceImageUrl": null,
+    "HighlightEvent": "Space Shuttle program: Atlantis launches from the Kennedy Space Center on mission STS-81 to the Russian space station Mir, carrying astronaut Jerry M. Linenger for a four-month stay on board the station, replacing astronaut John E. Blaha.",
+    "SavedAt": "2026-10-17T16:33:59.7037876+01:00"
+  }
+]
