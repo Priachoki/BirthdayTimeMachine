@@ -38,6 +38,28 @@
     <div class="alert alert-danger mt-3">@errorMessage</div>
 }
 
+@if (age != null)
+{
+    <div class="alert alert-light border mt-3">
+        <h5><i class="bi bi-person-heart me-1"></i> About you</h5>
+        <p class="mb-0">
+            You were born on a <strong>@age.BornOnWeekday</strong>.<br />
+            You are <strong>@age.Years</strong> years old, which is <strong>@age.TotalDays.ToString("N0")</strong> days
+            (@age.TotalWeeks.ToString("N0") weeks).<br />
+            @if (age.IsBirthdayToday)
+            {
+                <span><i class="bi bi-balloon-heart me-1"></i> Happy birthday, it's today!</span>
+            }
+            else
+            {
+                <span>
+                    Your next birthday is on a <strong>@age.NextBirthday.DayOfWeek</strong>
+                    (@age.NextBirthday.ToString("d MMMM yyyy")), in <strong>@age.DaysUntilNextBirthday</strong> days.
+                </span>
+            }
+        </p>
+    </div>
+}  
 @if (location != null)
 {
     <div class="alert alert-success mt-3">
@@ -140,6 +162,7 @@
     private WeatherDay? weather;
     private OnThisDayResult? history;
     private SpacePicture? spacePicture;
+    private AgeSummary? age;
     private string? historyError;
     private string? errorMessage;
     private bool isLoading;
@@ -154,10 +177,21 @@
         location = null;
         weather = null;
         history = null;
-        isLoading = true;
         spaceMessage = null;
         showNasaLink = false;
-        spacePicture = null;
+                spacePicture = null;
+        age = null;
+
+        // check the date before calling any APIs
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        if (birthDate > today)
+        {
+            errorMessage = "Your date of birth can't be in the future.";
+            return;
+        }
+
+        age = AgeCalculator.Calculate(birthDate, today);
+        isLoading = true;
 
         try
         {
