@@ -7,10 +7,16 @@
 @inject IWeatherHistoryService WeatherService
 @inject IOnThisDayService OnThisDayService
 @inject INasaApodService NasaService
+@inject IReportStorageService ReportStorage
 
 <PageTitle>Birthday Report</PageTitle>
 
 <h1>Birthday Time Machine</h1>
+
+<div class="mb-3" style="max-width: 400px;">
+    <label class="form-label">Your name (optional)</label>
+    <input class="form-control" @bind="nameInput" placeholder="e.g. Priya" />
+</div>
 
 <div class="mb-3" style="max-width: 400px;">
     <label class="form-label">City you were born in</label>
@@ -59,7 +65,24 @@
             }
         </p>
     </div>
-}  
+} 
+
+@if (location != null && !isLoading)
+{
+    <div class="d-flex align-items-center gap-3 mt-3">
+        <button class="btn btn-success" @onclick="SaveReport" disabled="@isSaved">
+            <i class="bi bi-bookmark-plus me-1"></i> @(isSaved ? "Saved" : "Save this report")
+        </button>
+        @if (!string.IsNullOrEmpty(saveMessage))
+        {
+            <span>@saveMessage</span>
+        }
+        @if (isSaved)
+        {
+            <a href="saved">View saved reports</a>
+        }
+    </div>
+}
 @if (location != null)
 {
     <div class="alert alert-success mt-3">
@@ -168,6 +191,9 @@
     private bool isLoading;
     private string? spaceMessage;
     private bool showNasaLink;
+    private string nameInput = string.Empty;
+    private bool isSaved;
+    private string? saveMessage;
 
 
     private async Task ShowBirthday()
@@ -181,6 +207,8 @@
         showNasaLink = false;
                 spacePicture = null;
         age = null;
+        isSaved = false;
+        saveMessage = null;
 
         // check the date before calling any APIs
         DateOnly today = DateOnly.FromDateTime(DateTime.Today);
@@ -246,6 +274,47 @@
             errorMessage = ex.Message;
         }
     }
+
+        private async Task SaveReport()
+    {
+        if (location == null)
+        {
+            return;
+        }
+
+        var report = new SavedReport
+        {
+            Name = string.IsNullOrWhiteSpace(nameInput) ? "Me" : nameInput.Trim(),
+            BirthDate = birthDate,
+            City = location.DisplayName,
+            CountryCode = location.CountryCode,
+            MaxTemperature = weather?.MaxTemperature,
+            MinTemperature = weather?.MinTemperature,
+            Precipitation = weather?.Precipitation,
+            MaxWindSpeed = weather?.MaxWindSpeed,
+            WeatherCode = weather?.WeatherCode,
+            SpaceTitle = spacePicture?.Title,
+            SpaceImageUrl = spacePicture?.ImageUrl,
+            HighlightEvent = history?.SameYearEvents.FirstOrDefault()?.Text
+                             ?? history?.Events.FirstOrDefault()?.Text
+        };
+
+        try
+        {
+            await ReportStorage.SaveAsync(report);
+            isSaved = true;
+            saveMessage = "Report saved.";
+        }
+        catch (IOException)
+        {
+            saveMessage = "Couldn't save the report. Please try again.";
+        }
+        catch (UnauthorizedAccessException)
+        {
+            saveMessage = "The app doesn't have permission to save reports.";
+        }
+    }
+
 
     private async Task LoadHistory()
     {

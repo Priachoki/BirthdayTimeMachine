@@ -38,6 +38,14 @@ builder.Services.AddHttpClient<INasaApodService, NasaApodService>(client =>
     client.DefaultRequestHeaders.UserAgent.ParseAdd("BirthdayTimeMachine/1.0 (college student project)");
 });
 
+// Saved reports are stored in Data/reports.json (no database needed)
+builder.Services.AddSingleton<IReportStorageService>(sp =>
+{
+    var env = sp.GetRequiredService<IWebHostEnvironment>();
+    string path = Path.Combine(env.ContentRootPath, "Data", "reports.json");
+    return new JsonReportStorageService(path);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
