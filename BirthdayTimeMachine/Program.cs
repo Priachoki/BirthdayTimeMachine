@@ -46,6 +46,20 @@ builder.Services.AddSingleton<IReportStorageService>(sp =>
     return new JsonReportStorageService(path);
 });
 
+// The Movie Database (TMDB) - films released around the birthday
+builder.Services.AddHttpClient<IMovieService, MovieService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.themoviedb.org/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+
+// Nager.Date - public holidays by country and year
+builder.Services.AddHttpClient<IHolidayService, HolidayService>(client =>
+{
+    client.BaseAddress = new Uri("https://date.nager.at/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
