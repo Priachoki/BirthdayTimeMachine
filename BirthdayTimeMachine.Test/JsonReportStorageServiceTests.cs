@@ -1,6 +1,5 @@
 ﻿using BirthdayTimeMachine.Models;
 using BirthdayTimeMachine.Services;
-using static System.Net.WebRequestMethods;
 
 namespace BirthdayTimeMachine.Test
 {
@@ -111,7 +110,9 @@ namespace BirthdayTimeMachine.Test
         {
             Directory.CreateDirectory(Path.GetDirectoryName(_filePath)!);
             await File.WriteAllTextAsync(_filePath, "{ this is not valid json");
-            var storage = new JsonReportStorageService(_filePath); Add API mapping tests with fake HTTP handler, plus report and storage tests
+            var storage = new JsonReportStorageService(_filePath);
+
+            List<SavedReport> reports = await storage.GetAllAsync();
 
             Assert.Empty(reports);
         }
