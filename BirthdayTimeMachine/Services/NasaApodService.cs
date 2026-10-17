@@ -37,8 +37,17 @@ namespace BirthdayTimeMachine.Services
         // still check for the generic logo in case the new endpoint has the same problem
         public static bool IsPlaceholder(NasaApodResponse response)
         {
-            return response.Title.Equals("NASA Science", StringComparison.OrdinalIgnoreCase)
-                || (response.HdUrl?.Contains("nasa-logo", StringComparison.OrdinalIgnoreCase) ?? false);
+            if (response.Title.Equals("NASA Science", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (string.IsNullOrWhiteSpace(response.HdUrl))
+            {
+                return true;
+            }
+
+            return !response.HdUrl.Contains("/apod/", StringComparison.OrdinalIgnoreCase);
         }
 
         // removes HTML tags and labels like "Explanation:" or "Image Credit:"
