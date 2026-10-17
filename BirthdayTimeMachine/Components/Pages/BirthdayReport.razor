@@ -4,6 +4,7 @@
 @using BirthdayTimeMachine.Helpers
 @inject IGeocodingService GeocodingService
 @inject IWeatherHistoryService WeatherService
+@inject IOnThisDayService OnThisDayService
 
 <PageTitle>Birthday Report</PageTitle>
 
@@ -19,7 +20,7 @@
     <input type="date" class="form-control" @bind="birthDate" />
 </div>
 
-<button class="btn btn-primary" @onclick="FindCity" disabled="@isLoading">
+<button class="btn btn-primary" @onclick="ShowBirthday" disabled="@isLoading">
     Show my birthday
 </button>
 
@@ -60,21 +61,68 @@
     </div>
 }
 
+@if (!string.IsNullOrEmpty(historyError))
+{
+    <div class="alert alert-warning mt-3">@historyError</div>
+}
+
+@if (history != null)
+{
+    <h3 class="mt-4">On this day in history</h3>
+
+    @if (history.SameYearEvents.Count > 0)
+    {
+        <div class="alert alert-primary">
+            <strong>In the year you were born (@birthDate.Year):</strong>
+            <ul class="mb-0">
+                @foreach (var e in history.SameYearEvents)
+                {
+                    <li>@e.Text</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <h5 class="mt-3">Events</h5>
+    <EventList Items="history.Events" />
+
+    <h5 class="mt-3">Famous people born on your birthday</h5>
+    <EventList Items="history.Births" />
+}
+
 @code {
     private string cityInput = string.Empty;
     private DateOnly birthDate = new DateOnly(2000, 1, 1);
     private GeocodingResult? location;
     private WeatherDay? weather;
+    private OnThisDayResult? history;
+    private string? historyError;
     private string? errorMessage;
     private bool isLoading;
 
-    private async Task FindCity()
+    private async Task ShowBirthday()
     {
         errorMessage = null;
+        historyError = null;
         location = null;
         weather = null;
+        history = null;
         isLoading = true;
 
+        try
+        {
+            // one section failing doesn't stop the others
+            await LoadLocationAndWeather();
+            await LoadHistory();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadLocationAndWeather()
+    {
         try
         {
             location = await GeocodingService.GetLocationAsync(cityInput);
@@ -112,9 +160,30 @@
         {
             errorMessage = ex.Message;
         }
-        finally
+    }
+
+    private async Task LoadHistory()
+    {
+        try
         {
-            isLoading = false;
+            history = await OnThisDayService.GetOnThisDayAsync(birthDate);
+
+            if (history == null)
+            {
+                historyError = "No history was found for that day.";
+            }
+        }
+        catch (HttpRequestException)
+        {
+            historyError = "Couldn't reach Wikipedia right now, so history isn't available.";
+        }
+        catch (TaskCanceledException)
+        {
+            historyError = "Wikipedia took too long to respond.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            historyError = ex.Message;
         }
     }
 }

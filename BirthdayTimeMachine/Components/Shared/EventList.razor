@@ -1,0 +1,35 @@
+﻿@using BirthdayTimeMachine.Models
+
+@* Reusable list of Wikipedia events or births *@
+
+@if (Items.Count == 0)
+{
+    <p class="text-muted">Nothing found.</p>
+}
+else
+{
+    <ul class="list-group mb-3">
+        @foreach (var item in Items)
+        {
+            <li class="list-group-item d-flex align-items-start gap-3">
+                @if (item.HasImage)
+                {
+                    <img src="@item.ImageUrl" alt="" style="width: 60px; height: 60px; object-fit: cover;" class="rounded" />
+                }
+                <div>
+                    <strong>@item.Year</strong> – @item.Text
+                    @if (!string.IsNullOrEmpty(item.ArticleUrl))
+                    {
+                        <br />
+                        <a href="@item.ArticleUrl" target="_blank" rel="noopener">Read more on Wikipedia</a>
+                    }
+                </div>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    [Parameter]
+    public List<HistoryEvent> Items { get; set; } = new();
+}
