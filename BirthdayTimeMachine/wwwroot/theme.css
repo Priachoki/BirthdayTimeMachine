@@ -1,0 +1,406 @@
+﻿/* Scrapbook theme: Mint & Tomato */
+:root {
+    --sb-page: #E6F4EE;
+    --sb-navy: #12355B;
+    --sb-ink: #1B2B3F;
+    --sb-muted: #4A5B70;
+    --sb-accent: #D2401F;
+    --sb-accent-dark: #A93217;
+    --sb-tape: #FFD23F;
+    --sb-margin: #F2826B;
+    --sb-shadow: rgba(18, 53, 91, .16);
+    --sb-hand: 'Caveat', cursive;
+    /* one highlighter colour per API */
+    --hl-city: #FFC78F;
+    --hl-weather: #A8E0FF;
+    --hl-space: #D7C4FF;
+    --hl-film: #FFB5C2;
+    --hl-holiday: #B9F0C9;
+    --hl-history: #FFE26A;
+}
+
+body {
+    background: var(--sb-page);
+    color: var(--sb-ink);
+    font-family: 'Nunito', system-ui, sans-serif;
+}
+
+h1, h2, h3, .hand {
+    font-family: var(--sb-hand);
+    font-weight: 700;
+    color: var(--sb-navy);
+}
+
+h1 {
+    font-size: 3.4rem;
+}
+
+h2 {
+    font-size: 2.4rem;
+}
+
+h3 {
+    font-size: 1.9rem;
+}
+
+a {
+    color: var(--sb-accent);
+}
+
+    a:hover {
+        color: var(--sb-accent-dark);
+    }
+
+.text-muted-sb {
+    color: var(--sb-muted);
+}
+
+.accent {
+    color: var(--sb-accent);
+}
+
+/* Page frame: header at the top, footer pushed to the bottom */
+.app-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: clip;
+}
+
+.site-main {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+/* Navbar */
+.site-nav {
+    background: var(--sb-navy);
+    color: #fff;
+}
+
+    .site-nav .brand {
+        font-family: var(--sb-hand);
+        font-weight: 700;
+        font-size: 2rem;
+        color: #fff;
+        text-decoration: none;
+        line-height: 1;
+    }
+
+    .site-nav .nav-item-link {
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        padding-bottom: 2px;
+        border-bottom: 2px solid transparent;
+    }
+
+        .site-nav .nav-item-link:hover,
+        .site-nav .nav-item-link.active {
+            color: var(--sb-tape);
+            border-bottom-color: var(--sb-tape);
+        }
+
+/* Footer: a deeper mint strip with a dashed edge, so it blends with the page */
+.site-footer {
+    background: #D3ECE1;
+    color: var(--sb-ink);
+    border-top: 2px dashed #9FC3B4;
+}
+
+    .site-footer .brand {
+        font-family: var(--sb-hand);
+        font-weight: 700;
+        font-size: 1.4rem;
+        color: var(--sb-navy);
+        text-decoration: none;
+        line-height: 1;
+    }
+
+.footer-muted {
+    color: var(--sb-muted);
+}
+
+.site-footer .source-tag {
+    text-decoration: none;
+    color: var(--sb-ink);
+    box-shadow: 0 2px 4px var(--sb-shadow);
+}
+
+    .site-footer .source-tag:hover {
+        color: var(--sb-ink);
+        filter: brightness(1.05);
+    }
+
+/* Buttons and forms */
+.btn {
+    font-weight: 800;
+}
+
+.btn-primary {
+    background-color: var(--sb-accent);
+    border-color: var(--sb-accent);
+    color: #fff;
+    border-radius: 999px;
+    padding-left: 1.4rem;
+    padding-right: 1.4rem;
+}
+
+    .btn-primary:hover, .btn-primary:focus, .btn-primary:active,
+    .btn-primary:disabled {
+        background-color: var(--sb-accent-dark) !important;
+        border-color: var(--sb-accent-dark) !important;
+        color: #fff !important;
+    }
+
+.btn-outline-secondary {
+    color: var(--sb-navy);
+    border: 2px solid var(--sb-navy);
+    border-radius: 999px;
+}
+
+    .btn-outline-secondary:hover {
+        background-color: var(--sb-navy);
+        border-color: var(--sb-navy);
+        color: #fff;
+    }
+
+.btn-outline-danger {
+    border-radius: 999px;
+}
+
+.form-label {
+    font-family: var(--sb-hand);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--sb-navy);
+    margin-bottom: 0;
+}
+
+.form-control, .form-select {
+    border: 0;
+    border-bottom: 2px solid var(--sb-navy);
+    border-radius: 0;
+    background-color: transparent;
+    font-size: 1.1rem;
+}
+
+    .form-control:focus, .form-select:focus {
+        background-color: transparent;
+        border-color: var(--sb-accent);
+        box-shadow: 0 2px 0 0 var(--sb-accent);
+    }
+
+/* Paper pieces */
+.paper {
+    background: #fff;
+    padding: 1.4rem;
+    box-shadow: 0 6px 16px var(--sb-shadow);
+    position: relative;
+}
+
+.paper-cream {
+    background: #fff;
+}
+
+.note-yellow {
+    background: #FFEB99;
+}
+
+.note-green {
+    background: #D9F7E2;
+}
+
+.note-blue {
+    background: #DDF1FF;
+}
+
+.note-pink {
+    background: #FFE1E6;
+}
+
+.note-purple {
+    background: #ECE3FF;
+}
+
+.tilt-l {
+    transform: rotate(-1.5deg);
+}
+
+.tilt-r {
+    transform: rotate(1.5deg);
+}
+
+.tilt-l2 {
+    transform: rotate(-2.5deg);
+}
+
+.tilt-r2 {
+    transform: rotate(2.5deg);
+}
+
+/* Strip of tape on top of a piece of paper */
+.tape::before {
+    content: "";
+    position: absolute;
+    top: -14px;
+    left: 42%;
+    width: 110px;
+    height: 28px;
+    background: rgba(255, 210, 63, .8);
+    transform: rotate(-3deg);
+}
+
+/* Lined notebook paper */
+.lined {
+    background-color: #fff;
+    background-image: repeating-linear-gradient(#fff 0 31px, #DDE6EE 31px 32px);
+    border-left: 3px solid var(--sb-margin);
+    line-height: 32px;
+}
+
+/* Pin at the top of a note */
+.pin {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    width: 18px;
+    height: 18px;
+    margin-left: -9px;
+    border-radius: 50%;
+    background: var(--sb-accent);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, .3);
+}
+
+.polaroid {
+    background: #fff;
+    padding: .75rem .75rem 1rem;
+    box-shadow: 0 6px 16px var(--sb-shadow);
+    position: relative;
+}
+
+    .polaroid img {
+        width: 100%;
+        height: 170px;
+        object-fit: cover;
+        display: block;
+    }
+
+/* Dashed string the timeline notes hang from */
+.string-row {
+    position: relative;
+    padding-top: 1rem;
+}
+
+    .string-row::before {
+        content: "";
+        position: absolute;
+        top: 1rem;
+        left: 0;
+        right: 0;
+        border-top: 2px dashed #7F9BB3;
+    }
+
+/* Highlighter marks for the story sentence */
+.hl-city {
+    background: linear-gradient(transparent 52%, var(--hl-city) 52%);
+}
+
+.hl-weather {
+    background: linear-gradient(transparent 52%, var(--hl-weather) 52%);
+}
+
+.hl-space {
+    background: linear-gradient(transparent 52%, var(--hl-space) 52%);
+}
+
+.hl-film {
+    background: linear-gradient(transparent 52%, var(--hl-film) 52%);
+}
+
+.hl-holiday {
+    background: linear-gradient(transparent 52%, var(--hl-holiday) 52%);
+}
+
+.hl-history {
+    background: linear-gradient(transparent 52%, var(--hl-history) 52%);
+}
+
+/* Little tape labels that name each API */
+.source-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    font-size: .8rem;
+    font-weight: 800;
+    color: var(--sb-ink);
+}
+
+    .source-tag:nth-child(odd) {
+        transform: rotate(-2deg);
+    }
+
+    .source-tag:nth-child(even) {
+        transform: rotate(1.5deg);
+    }
+
+.tag-city {
+    background: var(--hl-city);
+}
+
+.tag-weather {
+    background: var(--hl-weather);
+}
+
+.tag-space {
+    background: var(--hl-space);
+}
+
+.tag-film {
+    background: var(--hl-film);
+}
+
+.tag-holiday {
+    background: var(--hl-holiday);
+}
+
+.tag-history {
+    background: var(--hl-history);
+}
+
+.story {
+    font-family: var(--sb-hand);
+    font-weight: 600;
+    font-size: 2.2rem;
+    line-height: 1.35;
+    color: var(--sb-ink);
+}
+
+@media (max-width: 767.98px) {
+    h1 {
+        font-size: 2.6rem;
+    }
+
+    .story {
+        font-size: 1.7rem;
+    }
+}
+
+/* Blazor error bar (moved from MainLayout.razor.css) */
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }

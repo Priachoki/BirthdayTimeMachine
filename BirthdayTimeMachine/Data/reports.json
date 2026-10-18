@@ -46,5 +46,21 @@
     "SpaceImageUrl": null,
     "HighlightEvent": "Space Shuttle program: Atlantis launches from the Kennedy Space Center on mission STS-81 to the Russian space station Mir, carrying astronaut Jerry M. Linenger for a four-month stay on board the station, replacing astronaut John E. Blaha.",
     "SavedAt": "2026-10-17T16:33:59.7037876+01:00"
+  },
+  {
+    "Id": "0b8c012b-bf4e-4ccb-837e-cf41843e14f7",
+    "Name": "Leon Don",
+    "BirthDate": "1994-07-01",
+    "City": "Paris, \u00CEle-de-France Region, France",
+    "CountryCode": "FR",
+    "MaxTemperature": 31.4,
+    "MinTemperature": 14.3,
+    "Precipitation": 0.1,
+    "MaxWindSpeed": 18,
+    "WeatherCode": 51,
+    "SpaceTitle": null,
+    "SpaceImageUrl": null,
+    "HighlightEvent": "China resumes sovereignty over the city-state of Hong Kong, ending 156 years of British colonial rule. The handover ceremony is attended by British Prime Minister Tony Blair, Charles, Prince of Wales, Chinese President Jiang Zemin and U.S. Secretary of State Madeleine Albright.",
+    "SavedAt": "2026-10-18T01:04:02.5813916+01:00"
   }
 ]

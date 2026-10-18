@@ -2,16 +2,67 @@
 
 <PageTitle>Birthday Time Machine</PageTitle>
 
-<h1>Birthday Time Machine</h1>
+<section class="row align-items-center g-5 mb-5">
+    <div class="col-lg-5">
+        <h1 class="mb-2">Birthday Time Machine</h1>
+        <p class="lead text-muted-sb mb-4">
+            Pick your birthday and the city you were born in, and we'll make a scrapbook page
+            of that day from five different web services.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary btn-lg" href="birthday">
+                <i class="bi bi-clock-history"></i> Make my page
+            </a>
+            <a class="btn btn-outline-secondary btn-lg" href="saved">
+                <i class="bi bi-journal-bookmark"></i> Saved pages
+            </a>
+        </div>
+    </div>
 
-<p class="lead">
-    Travel back to the day you were born: the weather, NASA's picture of the day,
-    what happened in history, the films in cinemas and more.
-</p>
+    <div class="col-lg-7">
+        <div class="paper lined tape tilt-l ps-4 ps-md-5 py-4">
+            <p class="hand accent fs-3 mb-1">For example...</p>
+            <p class="story mb-3">
+                I arrived in <span class="hl-city">Dublin</span> on a
+                <span class="hl-weather">dry, 6.9°C</span> Saturday.
+                NASA photographed an <span class="hl-space">accretion disk</span>,
+                <span class="hl-film">Robots</span> was in cinemas, and
+                <span class="hl-holiday">St Patrick's Day</span> was 5 days away.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="source-tag tag-weather">Weather · Open-Meteo</span>
+                <span class="source-tag tag-space">Sky · NASA</span>
+                <span class="source-tag tag-film">Films · TMDB</span>
+                <span class="source-tag tag-holiday">Holiday · Nager.Date</span>
+                <span class="source-tag tag-history">History · Wikipedia</span>
+            </div>
+        </div>
+    </div>
+</section>
 
-<a class="btn btn-primary" href="birthday">
-    <i class="bi bi-clock-history"></i> Start your time machine
-</a>
-<a class="btn btn-outline-secondary ms-2" href="saved">
-    <i class="bi bi-bookmark"></i> View saved reports
-</a>
+<h2 class="mb-4">What goes on your page</h2>
+
+<div class="row g-4">
+    @foreach (var feature in features)
+    {
+        <div class="col-sm-6 col-lg-4">
+            <div class="paper @feature.NoteClass @feature.Tilt h-100">
+                <span class="pin"></span>
+                <h3 class="h4 mb-1"><i class="bi @feature.Icon"></i> @feature.Title</h3>
+                <p class="mb-0">@feature.Text</p>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private readonly (string Icon, string Title, string Text, string NoteClass, string Tilt)[] features =
+    {
+        ("bi-cloud-sun", "The weather", "The real weather in your city that day, from Open-Meteo.", "note-blue", "tilt-l"),
+        ("bi-stars", "The night sky", "NASA's Astronomy Picture of the Day on your birthday.", "note-purple", "tilt-r"),
+        ("bi-film", "At the cinema", "Popular films released around your birthday, from TMDB.", "note-pink", "tilt-l"),
+        ("bi-calendar-heart", "Holidays", "The closest public holiday to your birthday, from Nager.Date.", "note-green", "tilt-r"),
+        ("bi-book", "History", "Events and famous people born on your day, from Wikipedia.", "note-yellow", "tilt-l"),
+        ("bi-journal-bookmark", "Keep it", "Save your pages and sort or filter them later.", "paper-cream", "tilt-r")
+    };
+}
