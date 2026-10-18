@@ -62,5 +62,21 @@
     "SpaceImageUrl": null,
     "HighlightEvent": "China resumes sovereignty over the city-state of Hong Kong, ending 156 years of British colonial rule. The handover ceremony is attended by British Prime Minister Tony Blair, Charles, Prince of Wales, Chinese President Jiang Zemin and U.S. Secretary of State Madeleine Albright.",
     "SavedAt": "2026-10-18T01:04:02.5813916+01:00"
+  },
+  {
+    "Id": "0004a925-66f0-4e27-9f6f-371e58c4c52f",
+    "Name": "Lee Dee",
+    "BirthDate": "2006-01-01",
+    "City": "New York, New York, United States",
+    "CountryCode": "US",
+    "MaxTemperature": 5.6,
+    "MinTemperature": -3.2,
+    "Precipitation": 0,
+    "MaxWindSpeed": 7,
+    "WeatherCode": 71,
+    "SpaceTitle": "The Largest Rock in the Solar System",
+    "SpaceImageUrl": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2006/january/earth_vg1_big.jpg?w=280\u0026h=313\u0026fit=clip\u0026crop=faces%2Cfocalpoint",
+    "HighlightEvent": "Bulgaria and Romania join the EU.",
+    "SavedAt": "2026-10-18T01:31:09.8489636+01:00"
   }
 ]

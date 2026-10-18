@@ -25,9 +25,15 @@ body {
     font-family: 'Nunito', system-ui, sans-serif;
 }
 
-h1, h2, h3, .hand {
+h1, .hand {
     font-family: var(--sb-hand);
     font-weight: 700;
+    color: var(--sb-navy);
+}
+
+h2, h3, h4, h5 {
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-weight: 800;
     color: var(--sb-navy);
 }
 
@@ -36,11 +42,11 @@ h1 {
 }
 
 h2 {
-    font-size: 2.4rem;
+    font-size: 1.6rem;
 }
 
 h3 {
-    font-size: 1.9rem;
+    font-size: 1.2rem;
 }
 
 a {
@@ -170,11 +176,11 @@ a {
 }
 
 .form-label {
-    font-family: var(--sb-hand);
-    font-size: 1.5rem;
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-size: .85rem;
     font-weight: 700;
     color: var(--sb-navy);
-    margin-bottom: 0;
+    margin-bottom: .25rem;
 }
 
 .form-control, .form-select {
@@ -301,29 +307,29 @@ a {
         border-top: 2px dashed #7F9BB3;
     }
 
-/* Highlighter marks for the story sentence */
+/* Highlighter marks: colour on the lower part so it sits under the words */
 .hl-city {
-    background: linear-gradient(transparent 52%, var(--hl-city) 52%);
+    background: linear-gradient(transparent 60%, var(--hl-city) 60%);
 }
 
 .hl-weather {
-    background: linear-gradient(transparent 52%, var(--hl-weather) 52%);
+    background: linear-gradient(transparent 60%, var(--hl-weather) 60%);
 }
 
 .hl-space {
-    background: linear-gradient(transparent 52%, var(--hl-space) 52%);
+    background: linear-gradient(transparent 60%, var(--hl-space) 60%);
 }
 
 .hl-film {
-    background: linear-gradient(transparent 52%, var(--hl-film) 52%);
+    background: linear-gradient(transparent 60%, var(--hl-film) 60%);
 }
 
 .hl-holiday {
-    background: linear-gradient(transparent 52%, var(--hl-holiday) 52%);
+    background: linear-gradient(transparent 60%, var(--hl-holiday) 60%);
 }
 
 .hl-history {
-    background: linear-gradient(transparent 52%, var(--hl-history) 52%);
+    background: linear-gradient(transparent 60%, var(--hl-history) 60%);
 }
 
 /* Little tape labels that name each API */
@@ -398,9 +404,171 @@ a {
     z-index: 1000;
 }
 
-    #blazor-error-ui .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+/* Report and saved pages */
+.big-temp {
+    font-weight: 800;
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--sb-navy);
+}
+
+.photo-placeholder {
+    height: 170px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+    padding: .5rem;
+    background: #EEF3F6;
+    color: var(--sb-muted);
+    text-align: center;
+    font-size: .9rem;
+}
+
+.polaroid .polaroid-large {
+    height: auto;
+    max-height: 480px;
+    object-fit: contain;
+    background: #0E1424;
+}
+
+.poster-polaroid {
+    display: block;
+    text-decoration: none;
+    color: var(--sb-ink);
+    transition: transform .15s;
+}
+
+    .poster-polaroid img,
+    .poster-polaroid .photo-placeholder {
+        height: auto;
+        aspect-ratio: 2 / 3;
+        object-fit: cover;
     }
+
+    .poster-polaroid:hover {
+        color: var(--sb-ink);
+        transform: rotate(0) scale(1.03);
+    }
+
+.saved-photo {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    display: block;
+}
+
+.clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.section-title {
+    margin-top: 3.5rem;
+    margin-bottom: 1.5rem;
+}
+/* Wider lines for the big handwritten story so the text sits on them */
+.lined-story {
+    background-image: repeating-linear-gradient(#fff 0 47px, #DDE6EE 47px 48px);
+}
+
+    .lined-story p,
+    .lined-story .story {
+        line-height: 48px;
+    }
+
+/* History lists sit on the lined paper instead of in white boxes */
+.lined .list-group,
+.lined .list-group-item,
+.lined .card {
+    background: transparent;
+    border: 0;
+}
+
+.lined .list-group-item {
+    padding-left: 0;
+    padding-right: 0;
+}
+/* Scrapbook grid: every card gets its own angle, pin/tape spot and paper colour */
+.scrap-grid :is(.paper, .polaroid) {
+    transition: transform .2s;
+}
+
+.scrap-grid > :nth-child(6n+1) :is(.paper, .polaroid) {
+    transform: rotate(-1.5deg);
+}
+
+.scrap-grid > :nth-child(6n+2) :is(.paper, .polaroid) {
+    transform: rotate(1deg);
+}
+
+.scrap-grid > :nth-child(6n+3) :is(.paper, .polaroid) {
+    transform: rotate(-.5deg);
+}
+
+.scrap-grid > :nth-child(6n+4) :is(.paper, .polaroid) {
+    transform: rotate(2deg);
+}
+
+.scrap-grid > :nth-child(6n+5) :is(.paper, .polaroid) {
+    transform: rotate(-2deg);
+}
+
+.scrap-grid > :nth-child(6n) :is(.paper, .polaroid) {
+    transform: rotate(.75deg);
+}
+
+/* plain white cards sometimes get coloured paper (sticky notes and lined paper keep theirs) */
+.scrap-grid > :nth-child(6n+2) :is(.paper, .polaroid):not([class*="note-"]):not(.lined) {
+    background: #FFFBEA;
+}
+
+.scrap-grid > :nth-child(6n+4) :is(.paper, .polaroid):not([class*="note-"]):not(.lined) {
+    background: #F1F8FF;
+}
+
+.scrap-grid > :nth-child(6n) :is(.paper, .polaroid):not([class*="note-"]):not(.lined) {
+    background: #FFF3F5;
+}
+
+/* pins move around and change colour */
+.scrap-grid > :nth-child(3n+2) .pin {
+    left: 20%;
+    background: var(--sb-navy);
+}
+
+.scrap-grid > :nth-child(4n+3) .pin {
+    left: 78%;
+    background: #E0A800;
+}
+
+/* every third card is taped at the corner instead of pinned */
+.scrap-grid > :nth-child(3n) .pin {
+    display: none;
+}
+
+.scrap-grid > :nth-child(3n) :is(.paper, .polaroid)::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    right: -16px;
+    width: 90px;
+    height: 26px;
+    background: rgba(255, 210, 63, .8);
+    transform: rotate(35deg);
+}
+
+/* straighten a card when you hover over it */
+.scrap-grid :is(.paper, .polaroid):hover {
+    transform: rotate(0) scale(1.02);
+    z-index: 2;
+}

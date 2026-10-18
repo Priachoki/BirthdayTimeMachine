@@ -4,112 +4,148 @@
 @using BirthdayTimeMachine.Services.Interfaces
 @inject IReportStorageService ReportStorage
 
-<PageTitle>Saved Reports</PageTitle>
+<PageTitle>Saved pages</PageTitle>
 
-<h1>Saved Reports</h1>
+<h1 class="mb-1">Saved pages</h1>
+<p class="lead text-muted-sb mb-4">Every birthday you've saved, pinned in one place.</p>
 
 @if (isLoading)
 {
-    <div class="spinner-border text-primary mt-3" role="status">
-        <span class="visually-hidden">Loading...</span>
+    <div class="d-flex align-items-center gap-3">
+        <div class="spinner-border" style="color: var(--sb-accent);" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <span class="hand fs-3">Opening the scrapbook...</span>
     </div>
 }
 else if (!string.IsNullOrEmpty(errorMessage))
 {
-    <div class="alert alert-danger mt-3">@errorMessage</div>
+    <div class="paper note-pink"><i class="bi bi-exclamation-circle me-1"></i> @errorMessage</div>
 }
 else if (allReports.Count == 0)
 {
-    <div class="alert alert-light border mt-3">
-        No saved reports yet. <a href="birthday">Make your first birthday report</a>.
+    <div class="paper note-yellow tape tilt-l" style="max-width: 520px;">
+        <h3 class="mb-2">Nothing pinned yet</h3>
+        <p class="mb-3">Make your first birthday page and save it to see it here.</p>
+        <a class="btn btn-primary" href="birthday"><i class="bi bi-clock-history"></i> Make my page</a>
     </div>
 }
 else
 {
-    @* summary worked out with LINQ *@
-    <div class="alert alert-info mt-3">
-        <strong>@allReports.Count</strong> saved report(s).
-        @if (warmest != null)
-        {
-            <span> Warmest birthday: <strong>@warmest.Name</strong> (@warmest.MaxTemperature °C).</span>
-        }
-        @if (coldest != null)
-        {
-            <span> Coldest: <strong>@coldest.Name</strong> (@coldest.MaxTemperature °C).</span>
-        }
-        <span> Rainy birthdays: <strong>@allReports.Count(r => r.WasRainy)</strong>.</span>
+    <div class="row g-4 mb-5">
+        @* summary worked out with LINQ *@
+        <div class="col-lg-5">
+            <div class="paper note-yellow tape tilt-l h-100">
+                <h3 class="mb-2">In my scrapbook</h3>
+                <p class="mb-1"><strong>@allReports.Count</strong> saved page(s)</p>
+                @if (warmest != null)
+                {
+                    <p class="mb-1">
+                        <i class="bi bi-thermometer-sun"></i> Warmest:
+                        <strong>@warmest.Name</strong> (@(warmest.MaxTemperature)°C)
+                    </p>
+                }
+                @if (coldest != null)
+                {
+                    <p class="mb-1">
+                        <i class="bi bi-thermometer-snow"></i> Coldest:
+                        <strong>@coldest.Name</strong> (@(coldest.MaxTemperature)°C)
+                    </p>
+                }
+                <p class="mb-0">
+                    <i class="bi bi-cloud-rain"></i> Rainy birthdays: <strong>@allReports.Count(r => r.WasRainy)</strong>
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="paper tilt-r h-100">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label" for="search">Search by name or city</label>
+                        <input id="search" class="form-control" @bind="searchText" @bind:event="oninput" placeholder="e.g. Dublin" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="sort">Sort by</label>
+                        <select id="sort" class="form-select" @bind="sortOption">
+                            <option value="@ReportSortOption.RecentlySaved">Recently saved</option>
+                            <option value="@ReportSortOption.OldestBirthday">Oldest birthday first</option>
+                            <option value="@ReportSortOption.NewestBirthday">Newest birthday first</option>
+                            <option value="@ReportSortOption.Warmest">Warmest birthday</option>
+                            <option value="@ReportSortOption.Coldest">Coldest birthday</option>
+                            <option value="@ReportSortOption.Name">Name (A–Z)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="filter">Show</label>
+                        <select id="filter" class="form-select" @bind="filter">
+                            <option value="@ReportFilter.All">All pages</option>
+                            <option value="@ReportFilter.Rainy">Rainy birthdays</option>
+                            <option value="@ReportFilter.Dry">Dry birthdays</option>
+                            <option value="@ReportFilter.WithSpacePicture">With a NASA picture</option>
+                            <option value="@ReportFilter.BornBefore2000">Born before 2000</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="row g-3 mb-3">
-        <div class="col-md-4">
-            <label class="form-label" for="search">Search by name or city</label>
-            <input id="search" class="form-control" @bind="searchText" @bind:event="oninput" placeholder="e.g. Dublin" />
-        </div>
-        <div class="col-md-4">
-            <label class="form-label" for="sort">Sort by</label>
-            <select id="sort" class="form-select" @bind="sortOption">
-                <option value="@ReportSortOption.RecentlySaved">Recently saved</option>
-                <option value="@ReportSortOption.OldestBirthday">Oldest birthday first</option>
-                <option value="@ReportSortOption.NewestBirthday">Newest birthday first</option>
-                <option value="@ReportSortOption.Warmest">Warmest birthday</option>
-                <option value="@ReportSortOption.Coldest">Coldest birthday</option>
-                <option value="@ReportSortOption.Name">Name (A–Z)</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label" for="filter">Show</label>
-            <select id="filter" class="form-select" @bind="filter">
-                <option value="@ReportFilter.All">All reports</option>
-                <option value="@ReportFilter.Rainy">Rainy birthdays</option>
-                <option value="@ReportFilter.Dry">Dry birthdays</option>
-                <option value="@ReportFilter.WithSpacePicture">With a NASA picture</option>
-                <option value="@ReportFilter.BornBefore2000">Born before 2000</option>
-            </select>
-        </div>
-    </div>
+    var visible = VisibleReports;
 
-    @if (VisibleReports.Count == 0)
+    @if (visible.Count == 0)
     {
-        <p class="text-muted">No reports match your search.</p>
+        <p class="hand fs-3">No pages match your search.</p>
     }
     else
     {
-        <div class="row row-cols-1 row-cols-md-2 g-3">
-            @foreach (var report in VisibleReports)
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-5 scrap-grid">
+            @for (int i = 0; i < visible.Count; i++)
             {
+                var report = visible[i];
                 <div class="col">
-                    <div class="card h-100">
+                   <div class="paper h-100 d-flex flex-column">
+                        <span class="pin"></span>
+
                         @if (!string.IsNullOrEmpty(report.SpaceImageUrl))
-                        {
-                            <img src="@report.SpaceImageUrl" alt="@report.SpaceTitle" class="card-img-top" style="height: 180px; object-fit: cover;" />
-                        }
-                        <div class="card-body">
-                            <h5 class="card-title mb-1">@report.Name</h5>
-                            <p class="text-muted mb-2">
-                                @report.BirthDate.ToString("dddd, d MMMM yyyy") · @report.City
-                            </p>
-
-                            <p class="mb-2">
-                                <i class="bi @WeatherCodeMapper.GetIconClass(report.WeatherCode) me-1"></i>
-                                @WeatherCodeMapper.GetDescription(report.WeatherCode),
-                                @(report.MaxTemperature.HasValue ? $"{report.MaxTemperature} °C" : "no temperature data")
-                            </p>
-
-                            @if (!string.IsNullOrEmpty(report.SpaceTitle))
-                            {
-                                <p class="mb-2"><i class="bi bi-stars me-1"></i> @report.SpaceTitle</p>
-                            }
-
-                            @if (!string.IsNullOrEmpty(report.HighlightEvent))
-                            {
-                                <p class="small mb-2"><i class="bi bi-book me-1"></i> @report.HighlightEvent</p>
-                            }
-
-                            <p class="small text-muted mb-0">Saved @report.SavedAt.ToString("d MMM yyyy, HH:mm")</p>
+                    {
+                        <img class="saved-photo mb-3" src="@report.SpaceImageUrl" alt="@report.SpaceTitle" />
+                    }
+                    else
+                    {
+                        <div class="photo-placeholder mb-3">
+                            <i class="bi bi-stars fs-3"></i>
+                            <span class="small">No NASA picture for this day</span>
                         </div>
-                        <div class="card-footer bg-transparent">
+                    }
+
+                        <h3 class="mb-0">@report.Name</h3>
+                        <p class="small text-muted-sb mb-2">
+                            @report.BirthDate.ToString("dddd, d MMMM yyyy") · @report.City
+                        </p>
+
+                        <p class="mb-2">
+                            <i class="bi @WeatherCodeMapper.GetIconClass(report.WeatherCode) me-1"></i>
+                            <span class="hl-weather">
+                                @WeatherCodeMapper.GetDescription(report.WeatherCode),
+                                @(report.MaxTemperature.HasValue ? $"{report.MaxTemperature}°C" : "no temperature data")
+                            </span>
+                        </p>
+
+                        @if (!string.IsNullOrEmpty(report.SpaceTitle))
+                        {
+                            <p class="mb-2"><i class="bi bi-stars me-1"></i> <span class="hl-space">@report.SpaceTitle</span></p>
+                        }
+
+                        @if (!string.IsNullOrEmpty(report.HighlightEvent))
+                        {
+                            <p class="small mb-3 clamp-3"><i class="bi bi-book me-1"></i> @report.HighlightEvent</p>
+                        }
+
+                        <div class="mt-auto d-flex justify-content-between align-items-center gap-2">
+                            <span class="small text-muted-sb">Saved @report.SavedAt.ToString("d MMM yyyy")</span>
                             <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteReport(report.Id)">
-                                <i class="bi bi-trash me-1"></i> Delete
+                                <i class="bi bi-trash"></i> Delete
                             </button>
                         </div>
                     </div>
@@ -148,7 +184,7 @@ else
         }
         catch (IOException)
         {
-            errorMessage = "Couldn't load your saved reports.";
+            errorMessage = "Couldn't load your saved pages.";
         }
         finally
         {
@@ -166,7 +202,7 @@ else
         }
         catch (IOException)
         {
-            errorMessage = "Couldn't delete that report. Please try again.";
+            errorMessage = "Couldn't delete that page. Please try again.";
         }
     }
 

@@ -11,235 +11,346 @@
 @inject IMovieService MovieDb
 @inject IHolidayService Holidays
 
-<PageTitle>Birthday Report</PageTitle>
+<PageTitle>My birthday page</PageTitle>
 
-<h1>Birthday Time Machine</h1>
+<section class="mb-5">
+    <h1 class="mb-1">My birthday page</h1>
+    <p class="lead text-muted-sb mb-4">Tell us when and where you were born, and we'll travel back to that day.</p>
 
-<div class="mb-3" style="max-width: 400px;">
-    <label class="form-label">Your name (optional)</label>
-    <input class="form-control" @bind="nameInput" placeholder="e.g. Priya" />
-</div>
-
-<div class="mb-3" style="max-width: 400px;">
-    <label class="form-label">City you were born in</label>
-    <input class="form-control" @bind="cityInput" placeholder="e.g. Dublin" />
-</div>
-
-<div class="mb-3" style="max-width: 400px;">
-    <label class="form-label">Date of birth</label>
-    <input type="date" class="form-control" @bind="birthDate" />
-</div>
-
-<button class="btn btn-primary" @onclick="ShowBirthday" disabled="@isLoading">
-    Show my birthday
-</button>
+    <div class="paper tape tilt-l px-4 pt-4 pb-3">
+        <div class="row g-4 align-items-end">
+            <div class="col-md-6 col-lg-3">
+                <label class="form-label" for="name">Your name (optional)</label>
+                <input id="name" class="form-control" @bind="nameInput" placeholder="e.g. Priya" />
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <label class="form-label" for="city">Where were you born?</label>
+                <input id="city" class="form-control" @bind="cityInput" placeholder="e.g. Dublin" />
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <label class="form-label" for="dob">When?</label>
+                <input id="dob" type="date" class="form-control" @bind="birthDate" />
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <button class="btn btn-primary btn-lg w-100" @onclick="ShowBirthday" disabled="@isLoading">
+                    <i class="bi bi-clock-history"></i> Take me back
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
 
 @if (isLoading)
 {
-    <div class="spinner-border text-primary mt-3" role="status">
-        <span class="visually-hidden">Loading...</span>
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="spinner-border" style="color: var(--sb-accent);" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <span class="hand fs-3">Travelling back in time...</span>
     </div>
 }
 
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-    <div class="alert alert-danger mt-3">@errorMessage</div>
+    <div class="paper note-pink mb-4">
+        <i class="bi bi-exclamation-circle me-1"></i> @errorMessage
+    </div>
 }
 
-@if (age != null)
+@if (story != null && !isLoading)
 {
-    <div class="alert alert-light border mt-3">
-        <h5><i class="bi bi-person-heart me-1"></i> About you</h5>
-        <p class="mb-0">
-            You were born on a <strong>@age.BornOnWeekday</strong>.<br />
-            You are <strong>@age.Years</strong> years old, which is <strong>@age.TotalDays.ToString("N0")</strong> days
-            (@age.TotalWeeks.ToString("N0") weeks).<br />
-            @if (age.IsBirthdayToday)
+    @* the story: all the APIs in one sentence *@
+    <section class="paper lined tape tilt-r ps-4 ps-md-5 py-4 mb-5">
+        <p class="hand accent fs-3 mb-1">
+            The day @(string.IsNullOrWhiteSpace(nameInput) ? "I" : nameInput.Trim()) arrived · @birthDate.ToString("dddd, d MMMM yyyy")
+        </p>
+        <p class="story mb-3">
+            @foreach (var part in story)
             {
-                <span><i class="bi bi-balloon-heart me-1"></i> Happy birthday, it's today!</span>
-            }
-            else
-            {
-                <span>
-                    Your next birthday is on a <strong>@age.NextBirthday.DayOfWeek</strong>
-                    (@age.NextBirthday.ToString("d MMMM yyyy")), in <strong>@age.DaysUntilNextBirthday</strong> days.
-                </span>
+                if (part.Kind == StoryPartKind.Plain)
+                {
+                    @part.Text
+                }
+                else
+                {
+                    <span class="@BirthdayStory.GetCssClass(part.Kind)">@part.Text</span>
+                }
             }
         </p>
-    </div>
-} 
-
-@if (location != null && !isLoading)
-{
-    <div class="d-flex align-items-center gap-3 mt-3">
-        <button class="btn btn-success" @onclick="SaveReport" disabled="@isSaved">
-            <i class="bi bi-bookmark-plus me-1"></i> @(isSaved ? "Saved" : "Save this report")
-        </button>
-        @if (!string.IsNullOrEmpty(saveMessage))
-        {
-            <span>@saveMessage</span>
-        }
-        @if (isSaved)
-        {
-            <a href="saved">View saved reports</a>
-        }
-    </div>
-}
-@if (location != null)
-{
-    <div class="alert alert-success mt-3">
-        <h5>@location.DisplayName</h5>
-        <p class="mb-0">
-            Latitude: @location.Latitude, Longitude: @location.Longitude<br />
-            Country code: @location.CountryCode
-        </p>
-    </div>
-}
-
-@if (weather != null)
-{
-    <div class="alert alert-info mt-3">
-        <h5>Weather on @weather.Date.ToString("dddd, d MMMM yyyy")</h5>
-        <p class="mb-0">
-            High: @weather.MaxTemperature °C, Low: @weather.MinTemperature °C<br />
-            Rain: @weather.Precipitation mm<br />
-            Max wind: @weather.MaxWindSpeed km/h<br />
-            <i class="bi @WeatherCodeMapper.GetIconClass(weather.WeatherCode) fs-4 me-1"></i>
-            @WeatherCodeMapper.GetDescription(weather.WeatherCode)
-        </p>
-    </div>
-}
-
-@if (holiday != null && location != null)
-{
-    <div class="alert alert-warning mt-3">
-        <h5><i class="bi bi-calendar-heart me-1"></i> Public holidays</h5>
-        @if (holiday.IsOnBirthday)
-        {
-            <p class="mb-0">
-                You were born on a public holiday in @location.Country:
-                <strong>@holiday.Holiday.Name</strong> (@holiday.Holiday.LocalName)!
-            </p>
-        }
-        else
-        {
-            <p class="mb-0">
-                Your birthday wasn't a public holiday in @location.Country. The closest one was
-                <strong>@holiday.Holiday.Name</strong>,
-                @Math.Abs(holiday.DaysFromBirthday) day(s) @(holiday.DaysFromBirthday > 0 ? "after" : "before").
-            </p>
-        }
-    </div>
-}
-
-@if (!string.IsNullOrEmpty(holidayMessage))
-{
-    <div class="alert alert-secondary mt-3">@holidayMessage</div>
-}
-
-@if (spacePicture != null)
-{
-    <div class="card mt-3">
-        <div class="card-body">
-            <h5 class="card-title">Space on your birthday: @spacePicture.Title</h5>
-
-            @if (spacePicture.IsVideo)
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            @foreach (var kind in story.Select(p => p.Kind).Where(k => k != StoryPartKind.Plain).Distinct())
             {
-                <p>
-                    This day's picture is a video.
-                    <a href="@spacePicture.VideoUrl" target="_blank" rel="noopener">Watch it here</a>
-                </p>
-            }
-
-            @if (!string.IsNullOrEmpty(spacePicture.ImageUrl))
-            {
-                <img src="@spacePicture.ImageUrl" alt="@spacePicture.Title" class="img-fluid rounded mb-2" style="max-height: 400px;" />
-            }
-
-            <p class="card-text">@spacePicture.Explanation</p>
-
-            @if (!string.IsNullOrEmpty(spacePicture.Copyright))
-            {
-                <p class="text-muted small mb-0">Image credit: @spacePicture.Copyright</p>
+                <span class="source-tag @BirthdayStory.GetTagClass(kind)">@BirthdayStory.GetSourceName(kind)</span>
             }
         </div>
-    </div>
-}
 
-@if (!string.IsNullOrEmpty(spaceMessage))
-{
-    <div class="alert alert-secondary mt-3">
-        @spaceMessage
-        @if (showNasaLink)
+        @if (location != null)
         {
-            <br />
-            <a href="@NasaApodService.GetOfficialPageUrl(birthDate)" target="_blank" rel="noopener">See it on NASA's website instead</a>
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <button class="btn btn-primary" @onclick="SaveReport" disabled="@isSaved">
+                    <i class="bi bi-bookmark-heart"></i> @(isSaved ? "Saved!" : "Save this page")
+                </button>
+                @if (!string.IsNullOrEmpty(saveMessage))
+                {
+                    <span>@saveMessage</span>
+                }
+                @if (isSaved)
+                {
+                    <a href="saved">See my saved pages</a>
+                }
+            </div>
         }
-    </div>
-}
+    </section>
 
-@if (!string.IsNullOrEmpty(movieMessage))
-{
-    <div class="alert alert-secondary mt-3">@movieMessage</div>
-}
-
-@if (movies != null && movies.Count > 0)
-{
-    <h3 class="mt-4"><i class="bi bi-film me-1"></i> In cinemas around your birthday</h3>
-    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
-        @foreach (var movie in movies)
-        {
-            <div class="col">
-                <a href="@movie.TmdbUrl" target="_blank" rel="noopener" class="card h-100 text-decoration-none text-reset">
-                    @if (!string.IsNullOrEmpty(movie.PosterUrl))
+    @* hour by hour: one note per API *@
+    <h2 class="mb-3">My birthday, hour by hour</h2>
+    <div class="string-row mb-5">
+        <div class="row g-4 pt-3 scrape-grid">
+            <div class="col-md-6 col-lg-3">
+                <div class="paper note-yellow tilt-l2 h-100">
+                    <span class="pin"></span>
+                    <p class="hand fs-3 mb-1">8am · the weather</p>
+                    @if (weather != null)
                     {
-                        <img src="@movie.PosterUrl" alt="Poster for @movie.Title" class="card-img-top" />
+                        <p class="big-temp mb-1">@(weather.MaxTemperature)°C</p>
+                        <p class="mb-1">
+                            <i class="bi @WeatherCodeMapper.GetIconClass(weather.WeatherCode) me-1"></i>
+                            @WeatherCodeMapper.GetDescription(weather.WeatherCode)
+                        </p>
+                        <p class="small mb-0">
+                            Low @(weather.MinTemperature)°C · Rain @weather.Precipitation mm · Wind @weather.MaxWindSpeed km/h
+                        </p>
                     }
                     else
                     {
-                        <div class="card-img-top bg-secondary-subtle d-flex align-items-center justify-content-center" style="aspect-ratio: 2 / 3;">No poster</div>
+                        <p class="mb-0 text-muted-sb">No weather found for this day.</p>
                     }
-                    <div class="card-body p-2">
-                        <p class="fw-semibold small mb-1">@movie.Title</p>
-                        <p class="small text-muted mb-0">
-                            <i class="bi bi-star-fill text-warning me-1"></i>@movie.RatingText
-                            · @movie.ReleaseDate?.ToString("d MMM yyyy")
-                        </p>
-                    </div>
-                </a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="polaroid tilt-r h-100 mt-lg-3">
+                    <span class="pin"></span>
+                    @if (movies != null && movies.Count > 0)
+                    {
+                        var first = movies[0];
+                        @if (!string.IsNullOrEmpty(first.PosterUrl))
+                        {
+                            <img src="@first.PosterUrl" alt="Poster for @first.Title" />
+                        }
+                        else
+                        {
+                            <div class="photo-placeholder"><i class="bi bi-film fs-3"></i></div>
+                        }
+                        <p class="hand fs-3 mb-0 mt-2">3pm · at the cinema</p>
+                        <p class="small mb-0">@first.Title</p>
+                    }
+                    else
+                    {
+                        <div class="photo-placeholder"><i class="bi bi-film fs-3"></i></div>
+                        <p class="hand fs-3 mb-0 mt-2">3pm · at the cinema</p>
+                        <p class="small mb-0 text-muted-sb">@(movieMessage ?? "No films found.")</p>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="polaroid tilt-l h-100 mt-lg-1">
+                    <span class="pin"></span>
+                    @if (spacePicture != null && !string.IsNullOrEmpty(spacePicture.ImageUrl))
+                    {
+                        <img src="@spacePicture.ImageUrl" alt="@spacePicture.Title" />
+                    }
+                    else if (spacePicture != null && spacePicture.IsVideo)
+                    {
+                        <a class="photo-placeholder text-decoration-none" href="@spacePicture.VideoUrl" target="_blank" rel="noopener">
+                            <i class="bi bi-play-circle fs-2"></i> Watch NASA's video
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="photo-placeholder"><i class="bi bi-stars fs-3"></i></div>
+                    }
+                    <p class="hand fs-3 mb-0 mt-2">10pm · the night sky</p>
+                    @if (spacePicture != null)
+                    {
+                        <p class="small mb-0">@spacePicture.Title</p>
+                    }
+                    else
+                    {
+                        <p class="small mb-0 text-muted-sb">@spaceMessage</p>
+                        @if (showNasaLink)
+                        {
+                            <a class="small" href="@NasaApodService.GetOfficialPageUrl(birthDate)" target="_blank" rel="noopener">See it on NASA's website</a>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="paper note-green tilt-r2 h-100 mt-lg-4">
+                    <span class="pin"></span>
+                    @if (holiday != null)
+                    {
+                        <p class="hand fs-3 mb-1">@HolidayHeading()</p>
+                        <p class="fw-bold fs-5 mb-1">@holiday.Holiday.Name</p>
+                        <p class="small mb-0">@holiday.Holiday.LocalName · public holiday in @location?.Country</p>
+                    }
+                    else
+                    {
+                        <p class="hand fs-3 mb-1">Holidays</p>
+                        <p class="small mb-0 text-muted-sb">@(holidayMessage ?? "No holiday found.")</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* about me and where I was born *@
+    <div class="row g-4 mb-5 scrape-grid">
+        @if (age != null)
+        {
+            <div class="col-md-7">
+                <div class="paper note-blue tilt-l h-100">
+                    <span class="pin"></span>
+                    <h3 class="mb-2"><i class="bi bi-person-heart"></i> Me, since then</h3>
+                    <p class="mb-0">
+                        Born on a <strong>@age.BornOnWeekday</strong>.
+                        <strong>@age.Years</strong> years old, that's <strong>@age.TotalDays.ToString("N0")</strong> days
+                        (@age.TotalWeeks.ToString("N0") weeks).
+                        @if (age.IsBirthdayToday)
+                        {
+                            <span><i class="bi bi-balloon-heart"></i> Happy birthday, it's today!</span>
+                        }
+                        else
+                        {
+                            <span>
+                                Next birthday is on a <strong>@age.NextBirthday.DayOfWeek</strong>
+                                (@age.NextBirthday.ToString("d MMMM yyyy")), in <strong>@age.DaysUntilNextBirthday</strong> days.
+                            </span>
+                        }
+                    </p>
+                </div>
+            </div>
+        }
+
+        @if (location != null)
+        {
+            <div class="col-md-5">
+                <div class="paper tilt-r h-100">
+                    <span class="pin"></span>
+                    <h3 class="mb-2"><i class="bi bi-geo-alt"></i> Where I was born</h3>
+                    <p class="mb-1"><span class="hl-city">@location.DisplayName</span></p>
+                    <p class="small text-muted-sb mb-0">
+                        @location.Latitude, @location.Longitude · @location.CountryCode
+                    </p>
+                </div>
             </div>
         }
     </div>
-    <p class="small text-muted mt-2">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
-}
 
-@if (!string.IsNullOrEmpty(historyError))
-{
-    <div class="alert alert-warning mt-3">@historyError</div>
-}
-
-@if (history != null)
-{
-    <h3 class="mt-4">On this day in history</h3>
-
-    @if (history.SameYearEvents.Count > 0)
+    @* NASA picture in full *@
+    @if (spacePicture != null)
     {
-        <div class="alert alert-primary">
-            <strong>In the year you were born (@birthDate.Year):</strong>
-            <ul class="mb-0">
-                @foreach (var e in history.SameYearEvents)
-                {
-                    <li>@e.Text</li>
-                }
-            </ul>
+        <h2 class="section-title">The sky that day</h2>
+        <div class="row g-4 align-items-start mb-5">
+            @if (!string.IsNullOrEmpty(spacePicture.ImageUrl))
+            {
+                <div class="col-lg-6">
+                    <div class="polaroid tape tilt-l">
+                        <img class="polaroid-large" src="@spacePicture.ImageUrl" alt="@spacePicture.Title" />
+                        <p class="hand fs-3 mb-0 mt-2">@spacePicture.Title</p>
+                    </div>
+                </div>
+            }
+            <div class="col-lg-6">
+                <div class="paper lined tilt-r ps-4">
+                    <p class="hand fs-3 accent mb-1">@spacePicture.Title</p>
+                    @if (spacePicture.IsVideo)
+                    {
+                        <p class="mb-2">
+                            This day's picture is a video.
+                            <a href="@spacePicture.VideoUrl" target="_blank" rel="noopener">Watch it here</a>
+                        </p>
+                    }
+                    <p class="mb-2">@spacePicture.Explanation</p>
+                    @if (!string.IsNullOrEmpty(spacePicture.Copyright))
+                    {
+                        <p class="small text-muted-sb mb-0">Image credit: @spacePicture.Copyright</p>
+                    }
+                </div>
+            </div>
         </div>
     }
 
-    <h5 class="mt-3">Events</h5>
-    <EventList Items="history.Events" />
+    @* films *@
+    @if (movies != null && movies.Count > 0)
+    {
+        <h2 class="section-title">At the pictures that week</h2>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-4 scrap-grid">
+            @for (int i = 0; i < movies.Count; i++)
+            {
+                var movie = movies[i];
+                <div class="col">
+                    <a href="@movie.TmdbUrl" target="_blank" rel="noopener" class="polaroid poster-polaroid">
+                        @if (!string.IsNullOrEmpty(movie.PosterUrl))
+                        {
+                            <img src="@movie.PosterUrl" alt="Poster for @movie.Title" />
+                        }
+                        else
+                        {
+                            <div class="photo-placeholder">No poster</div>
+                        }
+                        <p class="fw-bold small mb-0 mt-2">@movie.Title</p>
+                        <p class="small text-muted-sb mb-0">
+                            <i class="bi bi-star-fill" style="color: #E0A800;"></i> @movie.RatingText
+                            · @movie.ReleaseDate?.ToString("d MMM")
+                        </p>
+                    </a>
+                </div>
+            }
+        </div>
+        <p class="small text-muted-sb mt-3">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+    }
 
-    <h5 class="mt-3">Famous people born on your birthday</h5>
-    <EventList Items="history.Births" />
+    @* history *@
+    @if (!string.IsNullOrEmpty(historyError))
+    {
+        <div class="paper note-pink mt-4"><i class="bi bi-exclamation-circle me-1"></i> @historyError</div>
+    }
+
+    @if (history != null)
+    {
+        <h2 class="section-title">Also on this day</h2>
+
+        @if (history.SameYearEvents.Count > 0)
+        {
+            <div class="paper note-yellow tape tilt-l mb-5">
+                <h3 class="mb-2">The year I was born (@birthDate.Year)</h3>
+                <ul class="mb-0">
+                    @foreach (var e in history.SameYearEvents)
+                    {
+                        <li>@e.Text</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="paper lined tilt-r ps-4 h-100">
+                    <h3 class="accent mb-2">In history</h3>
+                    <EventList Items="history.Events" />
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="paper lined tilt-l ps-4 h-100">
+                    <h3 class="accent mb-2">Born on my birthday</h3>
+                    <EventList Items="history.Births" />
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @code {
@@ -262,7 +373,7 @@
     private string? movieMessage;
     private HolidayResult? holiday;
     private string? holidayMessage;
-
+    private List<StoryPart>? story;
 
     private async Task ShowBirthday()
     {
@@ -281,6 +392,7 @@
         movieMessage = null;
         holiday = null;
         holidayMessage = null;
+        story = null;
 
         // check the date before calling any APIs
         DateOnly today = DateOnly.FromDateTime(DateTime.Today);
@@ -301,11 +413,45 @@
             await LoadHistory();
             await LoadMovies();
             await LoadHoliday();
+            BuildStory();
         }
         finally
         {
             isLoading = false;
         }
+    }
+
+    // puts the results from every API into one sentence
+    private void BuildStory()
+    {
+        var highlight = history?.SameYearEvents.FirstOrDefault() ?? history?.Events.FirstOrDefault();
+
+        story = BirthdayStory.Build(new BirthdayStoryInput
+        {
+            Name = nameInput,
+            BirthDate = birthDate,
+            City = location?.Name,
+            WeatherText = weather == null
+                ? null
+                : $"{WeatherCodeMapper.GetDescription(weather.WeatherCode).ToLower()}, {weather.MaxTemperature}°C",
+            SpaceTitle = spacePicture?.Title,
+            FilmTitle = movies?.FirstOrDefault()?.Title,
+            HolidayName = holiday?.Holiday.Name,
+            HolidayDaysFromBirthday = holiday == null || holiday.IsOnBirthday ? 0 : holiday.DaysFromBirthday,
+            HistoryYear = highlight?.Year,
+            HistoryText = highlight?.Text
+        });
+    }
+
+    private string HolidayHeading()
+    {
+        if (holiday == null || holiday.IsOnBirthday)
+        {
+            return "On the day itself!";
+        }
+
+        string days = BirthdayStory.FormatDays(Math.Abs(holiday.DaysFromBirthday));
+        return holiday.DaysFromBirthday > 0 ? $"{days} later" : $"{days} before";
     }
 
     private async Task LoadLocationAndWeather()
@@ -349,7 +495,7 @@
         }
     }
 
-        private async Task SaveReport()
+    private async Task SaveReport()
     {
         if (location == null)
         {
@@ -377,19 +523,19 @@
         {
             await ReportStorage.SaveAsync(report);
             isSaved = true;
-            saveMessage = "Report saved.";
+            saveMessage = "Page saved.";
         }
         catch (IOException)
         {
-            saveMessage = "Couldn't save the report. Please try again.";
+            saveMessage = "Couldn't save the page. Please try again.";
         }
         catch (UnauthorizedAccessException)
         {
-            saveMessage = "The app doesn't have permission to save reports.";
+            saveMessage = "The app doesn't have permission to save pages.";
         }
     }
 
-        private async Task LoadMovies()
+    private async Task LoadMovies()
     {
         try
         {
@@ -397,7 +543,7 @@
 
             if (movies.Count == 0)
             {
-                 movieMessage = "No well-known films were found around your birthday.";
+                movieMessage = "No well-known films were found around your birthday.";
             }
         }
         catch (HttpRequestException)
@@ -469,7 +615,8 @@
             historyError = ex.Message;
         }
     }
-     private async Task LoadSpacePicture()
+
+    private async Task LoadSpacePicture()
     {
         // check the date first so we don't waste an API call
         if (!NasaApodService.IsDateAvailable(birthDate))
