@@ -1,10 +1,13 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="app-shell">
-    <header class="site-nav">
-        <div class="container-xl d-flex flex-wrap align-items-center justify-content-between gap-3 py-3">
-            <a class="brand" href="">Birthday Time Machine</a>
-            <nav class="d-flex gap-4">
+  <header class="site-nav">
+        <div class="container-xl page-width d-flex flex-wrap align-items-start justify-content-between gap-3">
+            <a class="logo-badge" href="" aria-label="Birthday Time Machine home">
+                <span class="logo-script">Birthday</span>
+                <span class="logo-small">TIME MACHINE</span>
+            </a>
+            <nav class="site-links d-flex flex-wrap gap-4">
                 <NavLink class="nav-item-link" href="" Match="NavLinkMatch.All">Home</NavLink>
                 <NavLink class="nav-item-link" href="birthday">My birthday page</NavLink>
                 <NavLink class="nav-item-link" href="saved">Saved pages</NavLink>
@@ -13,13 +16,13 @@
     </header>
 
     <main class="site-main">
-        <div class="container-xl py-4 py-md-5">
+        <div class="container-xl page-width py-4 py-md-5">
             @Body
         </div>
     </main>
 
         <footer class="site-footer">
-        <div class="container-xl py-2 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+        <div class="container-xl page-width py-2 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
             <div>
                 <a class="brand" href="">Birthday Time Machine</a>
             </div>

@@ -1,68 +1,213 @@
 ﻿@page "/"
+@using BirthdayTimeMachine.Models
+@using BirthdayTimeMachine.Services.Interfaces
+@inject NavigationManager Nav
+@inject INasaApodService NasaService
+@inject IMovieService MovieDb
 
 <PageTitle>Birthday Time Machine</PageTitle>
 
 <section class="row align-items-center g-5 mb-5">
-    <div class="col-lg-5">
-        <h1 class="mb-2">Birthday Time Machine</h1>
-        <p class="lead text-muted-sb mb-4">
-            Pick your birthday and the city you were born in, and we'll make a scrapbook page
-            of that day from five different web services.
+    <div class="col-lg-7">
+        <p class="eyebrow mb-2">5 web services · 1 day</p>
+        <h1 class="hero-title mb-3">
+            <span class="hero-thin">Ever wondered</span>
+            <span class="hero-bold hero-mid">what the world was like</span>
+            <span class="hero-bold">the day you arrived?</span>
+        </h1>
+        <p class="lead text-muted-sb mb-4" style="max-width: 520px;">
+            Enter your birthday and where you were born. We'll gather the weather, NASA's sky,
+            the films, the holidays and history from that day onto one page.
         </p>
-        <div class="d-flex flex-wrap gap-2">
-            <a class="btn btn-primary btn-lg" href="birthday">
-                <i class="bi bi-clock-history"></i> Make my page
-            </a>
-            <a class="btn btn-outline-secondary btn-lg" href="saved">
-                <i class="bi bi-journal-bookmark"></i> Saved pages
-            </a>
-        </div>
+
+        @* sends the search to the birthday page *@
+        <form class="search-card" @onsubmit="Go">
+            <div class="row g-3 align-items-end">
+                <div class="col-sm-6">
+                    <label class="form-label" for="home-name">Your name (optional)</label>
+                    <input id="home-name" class="form-control" @bind="name" placeholder="e.g. Priya" />
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" for="home-city">Where were you born?</label>
+                    <input id="home-city" class="form-control" @bind="city" placeholder="e.g. Dublin" />
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label" for="home-date">When?</label>
+                    <input id="home-date" type="date" class="form-control" @bind="birthDate" />
+                </div>
+                <div class="col-sm-6">
+                    <button type="submit" class="btn btn-primary w-100" style="min-height: 46px;">
+                        Take me back <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(formError))
+            {
+                <p class="form-error small mt-2 mb-0"><i class="bi bi-exclamation-circle"></i> @formError</p>
+            }
+        </form>
+
+        <p class="small text-muted-sb mt-3 mb-0">
+            Been here before? <a href="saved" class="fw-bold">Open your saved pages</a>
+        </p>
     </div>
 
-    <div class="col-lg-7">
-        <div class="paper lined lined-story tape tilt-l ps-4 ps-md-5 py-4">
-            <p class="hand accent fs-3 mb-1">For example...</p>
-            <p class="story mb-3">
-                I arrived in <span class="hl-city">Dublin</span> on a
-                <span class="hl-weather">dry, 6.9°C</span> Saturday.
-                NASA photographed an <span class="hl-space">accretion disk</span>,
-                <span class="hl-film">Robots</span> was in cinemas, and
-                <span class="hl-holiday">St Patrick's Day</span> was 5 days away.
-            </p>
-            <div class="d-flex flex-wrap gap-2">
-                <span class="source-tag tag-weather">Weather · Open-Meteo</span>
-                <span class="source-tag tag-space">Sky · NASA</span>
-                <span class="source-tag tag-film">Films · TMDB</span>
-                <span class="source-tag tag-holiday">Holiday · Nager.Date</span>
-                <span class="source-tag tag-history">History · Wikipedia</span>
+    <div class="col-lg-5">
+        <div class="collage">
+            <div class="sticker s1">
+                <div class="rough">
+                    @if (skyImage != null)
+                    {
+                        <img class="sticker-img" src="@skyImage" alt="@skyTitle" />
+                    }
+                    else
+                    {
+                        <div class="sticker-photo sky"><i class="bi bi-stars"></i></div>
+                    }
+                    <p class="sticker-label">Yesterday's sky · NASA</p>
+                </div>
+            </div>
+            <div class="sticker s2">
+                <div class="rough">
+                    @if (posterUrl != null)
+                    {
+                        <img class="sticker-img poster" src="@posterUrl" alt="Poster for @filmTitle" />
+                    }
+                    else
+                    {
+                        <div class="sticker-photo film"><i class="bi bi-film"></i></div>
+                    }
+                    <p class="sticker-label">Recently in cinemas</p>
+                </div>
+            </div>
+            <div class="sticker s3">
+                <div class="rough p-4">
+                    <p class="sticker-label weather">Example · Dublin, 2005</p>
+                    <p class="sticker-big">6.9°C</p>
+                    <p class="small mb-0">Dry, no rain at all</p>
+                </div>
+            </div>
+            <div class="sticker s4">
+                <div class="rough p-3 px-4">
+                    <p class="sticker-label accent">Example · 5 days later</p>
+                    <p class="sticker-mid">St Patrick's Day</p>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<h2 class="mb-4">What goes on your page</h2>
-
-<div class="row g-4">
-    @foreach (var feature in features)
+<div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+    @foreach (var source in sources)
     {
-        <div class="col-sm-6 col-lg-4">
-            <div class="paper @feature.NoteClass @feature.Tilt h-100">
-                <span class="pin"></span>
-                <h3 class="h4 mb-1"><i class="bi @feature.Icon"></i> @feature.Title</h3>
-                <p class="mb-0">@feature.Text</p>
+        <div class="col">
+            <div class="source-card h-100">
+                <i class="bi @source.Icon"></i>
+                <p class="source-title">@source.Title</p>
+                <p class="small text-muted-sb mb-0">@source.Text</p>
             </div>
         </div>
     }
 </div>
 
 @code {
-    private readonly (string Icon, string Title, string Text, string NoteClass, string Tilt)[] features =
+    private string name = string.Empty;
+    private string city = string.Empty;
+    private DateOnly birthDate = new DateOnly(2000, 1, 1);
+    private string? formError;
+
+    // live pictures for the stickers (icons show if the APIs are down)
+    private string? skyImage;
+    private string? skyTitle;
+    private string? posterUrl;
+    private string? filmTitle;
+
+    private readonly (string Icon, string Title, string Text)[] sources =
     {
-        ("bi-cloud-sun", "The weather", "The real weather in your city that day, from Open-Meteo.", "note-blue", "tilt-l"),
-        ("bi-stars", "The night sky", "NASA's Astronomy Picture of the Day on your birthday.", "note-purple", "tilt-r"),
-        ("bi-film", "At the cinema", "Popular films released around your birthday, from TMDB.", "note-pink", "tilt-l"),
-        ("bi-calendar-heart", "Holidays", "The closest public holiday to your birthday, from Nager.Date.", "note-green", "tilt-r"),
-        ("bi-book", "History", "Events and famous people born on your day, from Wikipedia.", "note-yellow", "tilt-l"),
-        ("bi-journal-bookmark", "Keep it", "Save your pages and sort or filter them later.", "paper-cream", "tilt-r")
+        ("bi-cloud-sun", "Weather", "Open-Meteo archive"),
+        ("bi-stars", "The sky", "NASA picture of the day"),
+        ("bi-film", "Films", "TMDB, that week"),
+        ("bi-calendar-heart", "Holidays", "Nager.Date, closest one"),
+        ("bi-book", "History", "Wikipedia, on this day")
     };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await Task.WhenAll(LoadTodaysSky(), LoadRecentFilm());
+        StateHasChanged();
+    }
+
+    private async Task LoadTodaysSky()
+    {
+                // the NASA service only allows dates up to yesterday
+        var yesterday = DateOnly.FromDateTime(DateTime.Today).AddDays(-1);
+
+        try
+        {
+            var picture = await NasaService.GetPictureAsync(yesterday);
+
+            if (picture != null && !string.IsNullOrEmpty(picture.ImageUrl))
+            {
+                skyImage = picture.ImageUrl;
+                skyTitle = picture.Title;
+            }
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException
+                                or InvalidOperationException or ArgumentOutOfRangeException)
+        {
+            // keep the icon if NASA can't be reached
+        }
+    }
+
+    private async Task LoadRecentFilm()
+    {
+        try
+        {
+            // a few weeks back so the films have enough votes to show up
+            var films = await MovieDb.GetMoviesAroundDateAsync(DateOnly.FromDateTime(DateTime.Today).AddDays(-21));
+            var film = films.FirstOrDefault(f => !string.IsNullOrEmpty(f.PosterUrl));
+
+            if (film != null)
+            {
+                posterUrl = film.PosterUrl;
+                filmTitle = film.Title;
+            }
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or InvalidOperationException)
+        {
+            // keep the icon if TMDB can't be reached
+        }
+    }
+
+    // checks the form, then opens the birthday page with the search in the address
+    private void Go()
+    {
+        formError = null;
+
+        if (string.IsNullOrWhiteSpace(city))
+        {
+            formError = "Please enter the city you were born in.";
+            return;
+        }
+
+        if (birthDate > DateOnly.FromDateTime(DateTime.Today))
+        {
+            formError = "Your date of birth can't be in the future.";
+            return;
+        }
+
+        string url = $"birthday?city={Uri.EscapeDataString(city.Trim())}&date={birthDate:yyyy-MM-dd}";
+
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            url += $"&name={Uri.EscapeDataString(name.Trim())}";
+        }
+
+        Nav.NavigateTo(url);
+    }
 }

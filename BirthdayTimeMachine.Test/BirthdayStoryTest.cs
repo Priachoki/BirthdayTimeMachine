@@ -64,12 +64,11 @@ namespace BirthdayTimeMachine.Test
         [Fact]
         public void Build_WithNoFilm_LeavesOutTheCinemaPart()
         {
-            var input = FullInput() with { };
-            input = new BirthdayStoryInput
+            var input = new BirthdayStoryInput
             {
-                BirthDate = input.BirthDate,
-                City = input.City,
-                WeatherText = input.WeatherText,
+                BirthDate = Birthday,
+                City = "Dublin",
+                WeatherText = "clear sky, 6.9°C",
                 FilmTitle = null
             };
 

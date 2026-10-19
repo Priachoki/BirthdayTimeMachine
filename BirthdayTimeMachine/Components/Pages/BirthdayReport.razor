@@ -17,27 +17,30 @@
     <h1 class="mb-1">My birthday page</h1>
     <p class="lead text-muted-sb mb-4">Tell us when and where you were born, and we'll travel back to that day.</p>
 
-    <div class="paper tape tilt-l px-4 pt-4 pb-3">
-        <div class="row g-4 align-items-end">
-            <div class="col-md-6 col-lg-3">
-                <label class="form-label" for="name">Your name (optional)</label>
-                <input id="name" class="form-control" @bind="nameInput" placeholder="e.g. Priya" />
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <label class="form-label" for="city">Where were you born?</label>
-                <input id="city" class="form-control" @bind="cityInput" placeholder="e.g. Dublin" />
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <label class="form-label" for="dob">When?</label>
-                <input id="dob" type="date" class="form-control" @bind="birthDate" />
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <button class="btn btn-primary btn-lg w-100" @onclick="ShowBirthday" disabled="@isLoading">
-                    <i class="bi bi-clock-history"></i> Take me back
-                </button>
+
+    <div class="cut-shadow">
+        <div class="paper tape tilt-l px-4 pt-4 pb-3">
+            <div class="row g-4 align-items-end">
+                <div class="col-md-6 col-lg-3">
+                    <label class="form-label" for="name">Your name (optional)</label>
+                    <input id="name" class="form-control" @bind="nameInput" placeholder="e.g. Priya" />
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <label class="form-label" for="city">Where were you born?</label>
+                    <input id="city" class="form-control" @bind="cityInput" placeholder="e.g. Dublin" />
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <label class="form-label" for="dob">When?</label>
+                    <input id="dob" type="date" class="form-control" @bind="birthDate" />
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <button class="btn btn-primary btn-lg w-100" @onclick="ShowBirthday" disabled="@isLoading">
+                        <i class="bi bi-clock-history"></i> Take me back
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    </div> 
 </section>
 
 @if (isLoading)
@@ -60,6 +63,7 @@
 @if (story != null && !isLoading)
 {
     @* the story: all the APIs in one sentence *@
+<div class="cut-shadow mb-5">
     <section class="paper lined tape tilt-r ps-4 ps-md-5 py-4 mb-5">
         <p class="hand accent fs-3 mb-1">
             The day @(string.IsNullOrWhiteSpace(nameInput) ? "I" : nameInput.Trim()) arrived · @birthDate.ToString("dddd, d MMMM yyyy")
@@ -77,6 +81,14 @@
                 }
             }
         </p>
+
+        @if (loadSeconds.HasValue)
+        {
+            <p class="small text-muted-sb mb-2">
+                <i class="bi bi-lightning-charge"></i>
+                Fetched from 5 web services in @loadSeconds.Value.ToString("0.0") seconds
+            </p>
+        }
         <div class="d-flex flex-wrap gap-2 mb-3">
             @foreach (var kind in story.Select(p => p.Kind).Where(k => k != StoryPartKind.Plain).Distinct())
             {
@@ -101,6 +113,7 @@
             </div>
         }
     </section>
+</div>
 
     @* hour by hour: one note per API *@
     <h2 class="mb-3">My birthday, hour by hour</h2>
@@ -303,7 +316,7 @@
                         }
                         <p class="fw-bold small mb-0 mt-2">@movie.Title</p>
                         <p class="small text-muted-sb mb-0">
-                            <i class="bi bi-star-fill" style="color: #E0A800;"></i> @movie.RatingText
+                            <i class="bi bi-star-fill accent"></i> @movie.RatingText
                             · @movie.ReleaseDate?.ToString("d MMM")
                         </p>
                     </a>
@@ -325,32 +338,66 @@
 
         @if (history.SameYearEvents.Count > 0)
         {
-            <div class="paper note-yellow tape tilt-l mb-5">
-                <h3 class="mb-2">The year I was born (@birthDate.Year)</h3>
-                <ul class="mb-0">
-                    @foreach (var e in history.SameYearEvents)
-                    {
-                        <li>@e.Text</li>
-                    }
-                </ul>
+            <div class="cut-shadow mb-5">
+                <div class="paper note-green tilt-l">
+                    <h3 class="mb-2">The year I was born (@birthDate.Year)</h3>
+                    <ul class="mb-0">
+                        @foreach (var e in history.SameYearEvents)
+                        {
+                            <li>@e.Text</li>
+                        }
+                    </ul>
+                </div>
             </div>
         }
 
         <div class="row g-5">
             <div class="col-lg-6">
-                <div class="paper lined tilt-r ps-4 h-100">
-                    <h3 class="accent mb-2">In history</h3>
-                    <EventList Items="history.Events" />
+                <div class="paper tilt-r h-100 d-flex flex-column">
+                    <h3 class="mb-2">In history</h3>
+                    <EventList Items="history.Events.Take(2).ToList()" />
+                    @if (history.Events.Count > 2)
+                    {
+                        <button class="btn btn-outline-secondary btn-sm align-self-start mt-3" @onclick="OpenEvents">
+                            See all @history.Events.Count events
+                        </button>
+                    }
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="paper lined tilt-l ps-4 h-100">
-                    <h3 class="accent mb-2">Born on my birthday</h3>
-                    <EventList Items="history.Births" />
+                <div class="paper tilt-l h-100 d-flex flex-column">
+                    <h3 class="mb-2">Born on my birthday</h3>
+                    <EventList Items="history.Births.Take(2).ToList()" />
+                    @if (history.Births.Count > 2)
+                    {
+                        <button class="btn btn-outline-secondary btn-sm align-self-start mt-3" @onclick="OpenBirths">
+                            See all @history.Births.Count people
+                        </button>
+                    }
                 </div>
             </div>
         </div>
     }
+}
+
+@* pop-up with the full list *@
+@if (popupItems != null)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true"
+         aria-labelledby="popup-title" @onclick="ClosePopup">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" @onclick:stopPropagation="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="popup-title">@popupTitle</h2>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="ClosePopup"></button>
+                </div>
+                <div class="modal-body">
+                    <EventList Items="popupItems" />
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @code {
@@ -374,6 +421,54 @@
     private HolidayResult? holiday;
     private string? holidayMessage;
     private List<StoryPart>? story;
+    private double? loadSeconds;
+
+    // pop-up with the full history list
+    private List<HistoryEvent>? popupItems;
+    private string popupTitle = string.Empty;
+
+    private void OpenEvents()
+    {
+        popupTitle = "On this day in history";
+        popupItems = history?.Events.ToList();
+    }
+
+    private void OpenBirths()
+    {
+        popupTitle = "Born on my birthday";
+        popupItems = history?.Births.ToList();
+    }
+
+    private void ClosePopup() => popupItems = null;
+
+    // filled in when the home page sends a search, e.g. birthday?city=Dublin&date=2005-03-12
+    [SupplyParameterFromQuery(Name = "name")]
+    public string? NameFromQuery { get; set; }
+    [SupplyParameterFromQuery(Name = "city")]
+    public string? CityFromQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "date")]
+    public string? DateFromQuery { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // only run once, and only if the home page sent a city and a valid date
+        if (!firstRender || string.IsNullOrWhiteSpace(CityFromQuery) ||
+            !DateOnly.TryParseExact(DateFromQuery, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out var date))
+        {
+            return;
+        }
+
+        cityInput = CityFromQuery;
+        birthDate = date;
+        nameInput = NameFromQuery ?? string.Empty;
+
+        var search = ShowBirthday();
+        StateHasChanged();   // shows the spinner while the APIs load
+        await search;
+        StateHasChanged();
+    }
 
     private async Task ShowBirthday()
     {
@@ -393,6 +488,7 @@
         holiday = null;
         holidayMessage = null;
         story = null;
+        loadSeconds = null;
 
         // check the date before calling any APIs
         DateOnly today = DateOnly.FromDateTime(DateTime.Today);
@@ -404,19 +500,28 @@
 
         age = AgeCalculator.Calculate(birthDate, today);
         isLoading = true;
+        var timer = System.Diagnostics.Stopwatch.StartNew();
 
         try
         {
-            // one section failing doesn't stop the others
+            // NASA, Wikipedia and TMDB only need the date, so start them straight away
+            Task spaceTask = LoadSpacePicture();
+            Task historyTask = LoadHistory();
+            Task moviesTask = LoadMovies();
+
+            // weather and holidays need the location first
             await LoadLocationAndWeather();
-            await LoadSpacePicture();
-            await LoadHistory();
-            await LoadMovies();
-            await LoadHoliday();
+            Task holidayTask = LoadHoliday();
+
+            // each Load method catches its own errors, so one failing doesn't stop the rest
+            await Task.WhenAll(spaceTask, historyTask, moviesTask, holidayTask);
+
             BuildStory();
         }
         finally
         {
+            timer.Stop();
+            loadSeconds = timer.Elapsed.TotalSeconds;
             isLoading = false;
         }
     }
