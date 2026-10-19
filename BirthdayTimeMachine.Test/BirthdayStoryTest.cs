@@ -1,5 +1,4 @@
 ﻿using BirthdayTimeMachine.Helpers;
-using Xunit;
 
 namespace BirthdayTimeMachine.Test
 {

@@ -604,12 +604,29 @@ a {
     transition: transform .2s;
 }
 
-.scrap-grid > :nth-child(6n+1) :is(.paper, .polaroid) { transform: rotate(-1deg); }
-.scrap-grid > :nth-child(6n+2) :is(.paper, .polaroid) { transform: rotate(.6deg); }
-.scrap-grid > :nth-child(6n+3) :is(.paper, .polaroid) { transform: rotate(-.4deg); }
-.scrap-grid > :nth-child(6n+4) :is(.paper, .polaroid) { transform: rotate(1deg); }
-.scrap-grid > :nth-child(6n+5) :is(.paper, .polaroid) { transform: rotate(-.8deg); }
-.scrap-grid > :nth-child(6n) :is(.paper, .polaroid) { transform: rotate(.5deg); }
+.scrap-grid > :nth-child(6n+1) :is(.paper, .polaroid) {
+    transform: rotate(-1deg);
+}
+
+.scrap-grid > :nth-child(6n+2) :is(.paper, .polaroid) {
+    transform: rotate(.6deg);
+}
+
+.scrap-grid > :nth-child(6n+3) :is(.paper, .polaroid) {
+    transform: rotate(-.4deg);
+}
+
+.scrap-grid > :nth-child(6n+4) :is(.paper, .polaroid) {
+    transform: rotate(1deg);
+}
+
+.scrap-grid > :nth-child(6n+5) :is(.paper, .polaroid) {
+    transform: rotate(-.8deg);
+}
+
+.scrap-grid > :nth-child(6n) :is(.paper, .polaroid) {
+    transform: rotate(.5deg);
+}
 
 /* straighten a card when you hover over it */
 .scrap-grid :is(.paper, .polaroid):hover {

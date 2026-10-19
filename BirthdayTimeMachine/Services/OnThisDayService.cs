@@ -1,7 +1,6 @@
-﻿using System.Net.Http.Json;
-using System.Text.Json;
-using BirthdayTimeMachine.Models;
+﻿using BirthdayTimeMachine.Models;
 using BirthdayTimeMachine.Services.Interfaces;
+using System.Text.Json;
 
 namespace BirthdayTimeMachine.Services
 {

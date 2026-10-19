@@ -1,8 +1,7 @@
-﻿using System.Globalization;
-using System.Net.Http.Json;
-using System.Text.Json;
-using BirthdayTimeMachine.Models;
+﻿using BirthdayTimeMachine.Models;
 using BirthdayTimeMachine.Services.Interfaces;
+using System.Globalization;
+using System.Text.Json;
 
 namespace BirthdayTimeMachine.Services
 {
