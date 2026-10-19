@@ -142,7 +142,7 @@
         StateHasChanged();
     }
 
-    private async Task LoadTodaysSky()
+    private async Task LoadYesterdaysSky()
     {
                 // the NASA service only allows dates up to yesterday
         var yesterday = DateOnly.FromDateTime(DateTime.Today).AddDays(-1);
