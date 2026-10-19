@@ -6,7 +6,7 @@ For this assignment I wanted to make something a bit more interesting than a sta
 
 The Birthday Time Machine lets you enter your name, the city you were born in and your birthday. The app then combines information from six web services (five different providers) and puts it all on one page. It shows the weather on the day, NASA's picture of the sky, films released around that time, historical events, famous birthdays and the closest public holiday. It also creates a short summary that brings all of the information together into a single sentence about your birthday.
 
-![Home page](docs/screenshots/home.png)
+![Home page]("C:\SD4Projects\SOA\BirthdayTimeMachine\docs\home.png")
 
 ## Features
 
@@ -17,8 +17,8 @@ The Birthday Time Machine lets you enter your name, the city you were born in an
 - NASA's picture with its explanation, films from that week, and history and famous birthdays (with a pop-up to see more)
 - Save your birthday pages to a JSON file, then search, sort and filter them
 
-![Birthday page](docs/screenshots/birthday.png)
-![Saved pages](docs/screenshots/saved.png)
+![Birthday page]("C:\SD4Projects\SOA\BirthdayTimeMachine\docs\birthday.png")
+![Saved pages]("C:\SD4Projects\SOA\BirthdayTimeMachine\docs\saved.png")
 
 ## APIs I used
 
