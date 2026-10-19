@@ -78,5 +78,21 @@
     "SpaceImageUrl": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2006/january/earth_vg1_big.jpg?w=280\u0026h=313\u0026fit=clip\u0026crop=faces%2Cfocalpoint",
     "HighlightEvent": "Bulgaria and Romania join the EU.",
     "SavedAt": "2026-10-18T01:31:09.8489636+01:00"
+  },
+  {
+    "Id": "9262cbc6-8d44-43cb-b35d-5cb5f1f664f9",
+    "Name": "Priyanka Achoki",
+    "BirthDate": "2004-03-12",
+    "City": "Dublin, Leinster, Ireland",
+    "CountryCode": "IE",
+    "MaxTemperature": 9.1,
+    "MinTemperature": 2.6,
+    "Precipitation": 6.4,
+    "MaxWindSpeed": 35.5,
+    "WeatherCode": 73,
+    "SpaceTitle": "X-Ray Saturn",
+    "SpaceImageUrl": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2004/march/xraySaturn_cxc_bck.jpg?w=1423\u0026h=1153\u0026fit=clip\u0026crop=faces%2Cfocalpoint",
+    "HighlightEvent": "President of South Korea, Roh Moo-hyun, is impeached by its National Assembly, the first such impeachment in the nation\u0027s history.",
+    "SavedAt": "2026-10-19T21:13:14.7755988+01:00"
   }
 ]

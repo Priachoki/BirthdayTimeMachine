@@ -10,6 +10,7 @@
 @inject IReportStorageService ReportStorage
 @inject IMovieService MovieDb
 @inject IHolidayService Holidays
+@inject ILogger<BirthdayReport> Logger
 
 <PageTitle>My birthday page</PageTitle>
 
@@ -118,7 +119,7 @@
     @* hour by hour: one note per API *@
     <h2 class="mb-3">My birthday, hour by hour</h2>
     <div class="string-row mb-5">
-        <div class="row g-4 pt-3 scrape-grid">
+        <div class="row g-4 pt-3 scrap-grid">
             <div class="col-md-6 col-lg-3">
                 <div class="paper note-yellow tilt-l2 h-100">
                     <span class="pin"></span>
@@ -220,7 +221,7 @@
     </div>
 
     @* about me and where I was born *@
-    <div class="row g-4 mb-5 scrape-grid">
+    <div class="row g-4 mb-5 scrap-grid">
         @if (age != null)
         {
             <div class="col-md-7">
@@ -559,7 +560,7 @@
         return holiday.DaysFromBirthday > 0 ? $"{days} later" : $"{days} before";
     }
 
-    private async Task LoadLocationAndWeather()
+        private async Task LoadLocationAndWeather()
     {
         try
         {
@@ -580,22 +581,27 @@
         }
         catch (ArgumentOutOfRangeException ex)
         {
+            Logger.LogInformation("Date out of range for weather: {Date}", birthDate);
             errorMessage = ex.Message.Split(" (Parameter")[0];
         }
         catch (ArgumentException ex)
         {
+            Logger.LogInformation("Bad input for location: {City}", cityInput);
             errorMessage = ex.Message;
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
+            Logger.LogWarning(ex, "Geocoding or weather request failed for {City}", cityInput);
             errorMessage = "Couldn't reach the weather service. Check your internet connection.";
         }
-        catch (TaskCanceledException)
+        catch (TaskCanceledException ex)
         {
+            Logger.LogWarning(ex, "Geocoding or weather request timed out for {City}", cityInput);
             errorMessage = "The service took too long to respond. Please try again.";
         }
         catch (InvalidOperationException ex)
         {
+            Logger.LogWarning(ex, "Unexpected geocoding or weather response for {City}", cityInput);
             errorMessage = ex.Message;
         }
     }
@@ -630,12 +636,14 @@
             isSaved = true;
             saveMessage = "Page saved.";
         }
-        catch (IOException)
+        catch (IOException ex)
         {
+            Logger.LogError(ex, "Couldn't write the saved reports file");
             saveMessage = "Couldn't save the page. Please try again.";
         }
-        catch (UnauthorizedAccessException)
+        catch (UnauthorizedAccessException ex)
         {
+            Logger.LogError(ex, "No permission to write the saved reports file");
             saveMessage = "The app doesn't have permission to save pages.";
         }
     }
@@ -651,16 +659,19 @@
                 movieMessage = "No well-known films were found around your birthday.";
             }
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
+            Logger.LogWarning(ex, "TMDB request failed for {Date}", birthDate);
             movieMessage = "Couldn't reach the movie database right now.";
         }
-        catch (TaskCanceledException)
+        catch (TaskCanceledException ex)
         {
+            Logger.LogWarning(ex, "TMDB request timed out for {Date}", birthDate);
             movieMessage = "The movie database took too long to respond.";
         }
         catch (InvalidOperationException ex)
         {
+            Logger.LogWarning(ex, "TMDB problem (check the API key) for {Date}", birthDate);
             movieMessage = ex.Message;
         }
     }
@@ -682,16 +693,19 @@
                 holidayMessage = $"Public holiday data isn't available for {location.Country}.";
             }
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
+            Logger.LogWarning(ex, "Nager.Date request failed for {Country}", location.CountryCode);
             holidayMessage = "Couldn't reach the holiday service right now.";
         }
-        catch (TaskCanceledException)
+        catch (TaskCanceledException ex)
         {
+            Logger.LogWarning(ex, "Nager.Date request timed out for {Country}", location.CountryCode);
             holidayMessage = "The holiday service took too long to respond.";
         }
         catch (InvalidOperationException ex)
         {
+            Logger.LogWarning(ex, "Unexpected Nager.Date response for {Country}", location.CountryCode);
             holidayMessage = ex.Message;
         }
     }
@@ -707,16 +721,19 @@
                 historyError = "No history was found for that day.";
             }
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
+            Logger.LogWarning(ex, "Wikipedia request failed for {Date}", birthDate);
             historyError = "Couldn't reach Wikipedia right now, so history isn't available.";
         }
-        catch (TaskCanceledException)
+        catch (TaskCanceledException ex)
         {
+            Logger.LogWarning(ex, "Wikipedia request timed out for {Date}", birthDate);
             historyError = "Wikipedia took too long to respond.";
         }
         catch (InvalidOperationException ex)
         {
+            Logger.LogWarning(ex, "Unexpected Wikipedia response for {Date}", birthDate);
             historyError = ex.Message;
         }
     }
@@ -736,22 +753,26 @@
 
             if (spacePicture == null)
             {
+                Logger.LogInformation("NASA returned no usable picture for {Date}", birthDate);
                 spaceMessage = "NASA's picture for this day isn't available through their API right now.";
                 showNasaLink = true;
             }
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
+            Logger.LogWarning(ex, "NASA request failed for {Date}", birthDate);
             spaceMessage = "Couldn't reach NASA right now.";
             showNasaLink = true;
         }
-        catch (TaskCanceledException)
+        catch (TaskCanceledException ex)
         {
+            Logger.LogWarning(ex, "NASA request timed out for {Date}", birthDate);
             spaceMessage = "NASA took too long to respond.";
             showNasaLink = true;
         }
         catch (InvalidOperationException ex)
         {
+            Logger.LogWarning(ex, "Unexpected NASA response for {Date}", birthDate);
             spaceMessage = ex.Message;
         }
     }

@@ -3,6 +3,7 @@
 @using BirthdayTimeMachine.Helpers
 @using BirthdayTimeMachine.Services.Interfaces
 @inject IReportStorageService ReportStorage
+@inject ILogger<SavedReports> Logger
 
 <PageTitle>Saved pages</PageTitle>
 
@@ -182,8 +183,9 @@ else
             allReports = await ReportStorage.GetAllAsync();
             UpdateSummary();
         }
-        catch (IOException)
+        catch (IOException ex)
         {
+            Logger.LogError(ex, "Couldn't read the saved reports file");
             errorMessage = "Couldn't load your saved pages.";
         }
         finally
@@ -200,8 +202,9 @@ else
             allReports.RemoveAll(r => r.Id == id);
             UpdateSummary();
         }
-        catch (IOException)
+        catch (IOException ex)
         {
+            Logger.LogError(ex, "Couldn't delete report {Id}", id);
             errorMessage = "Couldn't delete that page. Please try again.";
         }
     }
