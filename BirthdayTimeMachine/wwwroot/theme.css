@@ -296,11 +296,11 @@ a {
     filter: drop-shadow(0 10px 16px rgba(0, 0, 0, .12));
 }
 
-/* the old sticky note classes now just add a thin green top edge */
-.note-yellow, .note-green, .note-blue, .note-pink, .note-purple {
+
+/* cards with a thin green top edge */
+.note {
     border-top: 4px solid var(--sb-accent);
 }
-
 /* small tilts so the cards look placed by hand */
 .tilt-l {
     transform: rotate(-.8deg);

@@ -16,16 +16,16 @@
         <div class="spinner-border" style="color: var(--sb-accent);" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
-        <span class="hand fs-3">Opening the scrapbook...</span>
+        <span class="hand">Opening the scrapbook...</span>
     </div>
 }
 else if (!string.IsNullOrEmpty(errorMessage))
 {
-    <div class="paper note-pink"><i class="bi bi-exclamation-circle me-1"></i> @errorMessage</div>
+    <div class="paper note"><i class="bi bi-exclamation-circle me-1"></i> @errorMessage</div>
 }
 else if (allReports.Count == 0)
 {
-    <div class="paper note-yellow tape tilt-l" style="max-width: 520px;">
+    <div class="paper note tape tilt-l" style="max-width: 520px;">
         <h3 class="mb-2">Nothing pinned yet</h3>
         <p class="mb-3">Make your first birthday page and save it to see it here.</p>
         <a class="btn btn-primary" href="birthday"><i class="bi bi-clock-history"></i> Make my page</a>
@@ -36,7 +36,7 @@ else
     <div class="row g-4 mb-5">
         @* summary worked out with LINQ *@
         <div class="col-lg-5">
-            <div class="paper note-yellow tape tilt-l h-100">
+            <div class="paper note tape tilt-l h-100">
                 <h3 class="mb-2">In my scrapbook</h3>
                 <p class="mb-1"><strong>@allReports.Count</strong> saved page(s)</p>
                 @if (warmest != null)
@@ -96,7 +96,7 @@ else
 
     @if (visible.Count == 0)
     {
-        <p class="hand fs-3">No pages match your search.</p>
+        <p class="hand">No pages match your search.</p>
     }
     else
     {
@@ -106,7 +106,7 @@ else
                 var report = visible[i];
                 <div class="col">
                    <div class="paper h-100 d-flex flex-column">
-                        <span class="pin"></span>
+                     
 
                         @if (!string.IsNullOrEmpty(report.SpaceImageUrl))
                     {
@@ -127,15 +127,13 @@ else
 
                         <p class="mb-2">
                             <i class="bi @WeatherCodeMapper.GetIconClass(report.WeatherCode) me-1"></i>
-                            <span class="hl-weather">
-                                @WeatherCodeMapper.GetDescription(report.WeatherCode),
-                                @(report.MaxTemperature.HasValue ? $"{report.MaxTemperature}°C" : "no temperature data")
-                            </span>
+                               @WeatherCodeMapper.GetDescription(report.WeatherCode),
+                               @(report.MaxTemperature.HasValue ? $"{report.MaxTemperature}°C" : "no temperature data")
                         </p>
 
                         @if (!string.IsNullOrEmpty(report.SpaceTitle))
                         {
-                            <p class="mb-2"><i class="bi bi-stars me-1"></i> <span class="hl-space">@report.SpaceTitle</span></p>
+                               @report.SpaceTitle
                         }
 
                         @if (!string.IsNullOrEmpty(report.HighlightEvent))

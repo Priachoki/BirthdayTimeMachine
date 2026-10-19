@@ -20,7 +20,7 @@
 
 
     <div class="cut-shadow">
-        <div class="paper tape tilt-l px-4 pt-4 pb-3">
+        <div class="paper tilt-l px-4 pt-4 pb-3">
             <div class="row g-4 align-items-end">
                 <div class="col-md-6 col-lg-3">
                     <label class="form-label" for="name">Your name (optional)</label>
@@ -50,13 +50,13 @@
         <div class="spinner-border" style="color: var(--sb-accent);" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
-        <span class="hand fs-3">Travelling back in time...</span>
+        <span class="hand">Travelling back in time...</span>
     </div>
 }
 
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-    <div class="paper note-pink mb-4">
+    <div class="paper note mb-4">
         <i class="bi bi-exclamation-circle me-1"></i> @errorMessage
     </div>
 }
@@ -65,7 +65,7 @@
 {
     @* the story: all the APIs in one sentence *@
 <div class="cut-shadow mb-5">
-    <section class="paper lined tape tilt-r ps-4 ps-md-5 py-4 mb-5">
+    <section class="paper tape tilt-r ps-4 ps-md-5 py-4 mb-5">
         <p class="hand accent fs-3 mb-1">
             The day @(string.IsNullOrWhiteSpace(nameInput) ? "I" : nameInput.Trim()) arrived · @birthDate.ToString("dddd, d MMMM yyyy")
         </p>
@@ -121,9 +121,9 @@
     <div class="string-row mb-5">
         <div class="row g-4 pt-3 scrap-grid">
             <div class="col-md-6 col-lg-3">
-                <div class="paper note-yellow tilt-l2 h-100">
-                    <span class="pin"></span>
-                    <p class="hand fs-3 mb-1">The weather</p>
+                <div class="paper note tilt-l2 h-100">
+                 
+                    <p class="hand mb-1">The weather</p>
                     @if (weather != null)
                     {
                         <p class="big-temp mb-1">@(weather.MaxTemperature)°C</p>
@@ -144,7 +144,7 @@
 
             <div class="col-md-6 col-lg-3">
                 <div class="polaroid tilt-r h-100 mt-lg-3">
-                    <span class="pin"></span>
+                 
                     @if (movies != null && movies.Count > 0)
                     {
                         var first = movies[0];
@@ -156,13 +156,13 @@
                         {
                             <div class="photo-placeholder"><i class="bi bi-film fs-3"></i></div>
                         }
-                        <p class="hand fs-3 mb-0 mt-2">In the cinema</p>
+                        <p class="hand mb-0 mt-2">In the cinema</p>
                         <p class="small mb-0">@first.Title</p>
                     }
                     else
                     {
                         <div class="photo-placeholder"><i class="bi bi-film fs-3"></i></div>
-                        <p class="hand fs-3 mb-0 mt-2">In the cinema</p>
+                        <p class="hand mb-0 mt-2">In the cinema</p>
                         <p class="small mb-0 text-muted-sb">@(movieMessage ?? "No films found.")</p>
                     }
                 </div>
@@ -170,7 +170,7 @@
 
             <div class="col-md-6 col-lg-3">
                 <div class="polaroid tilt-l h-100 mt-lg-1">
-                    <span class="pin"></span>
+                 
                     @if (spacePicture != null && !string.IsNullOrEmpty(spacePicture.ImageUrl))
                     {
                         <img src="@spacePicture.ImageUrl" alt="@spacePicture.Title" />
@@ -185,7 +185,7 @@
                     {
                         <div class="photo-placeholder"><i class="bi bi-stars fs-3"></i></div>
                     }
-                    <p class="hand fs-3 mb-0 mt-2">The night sky</p>
+                    <p class="hand mb-0 mt-2">The night sky</p>
                     @if (spacePicture != null)
                     {
                         <p class="small mb-0">@spacePicture.Title</p>
@@ -202,17 +202,17 @@
             </div>
 
             <div class="col-md-6 col-lg-3">
-                <div class="paper note-green tilt-r2 h-100 mt-lg-4">
-                    <span class="pin"></span>
+                <div class="paper note tilt-r2 h-100 mt-lg-4">
+                 
                     @if (holiday != null)
                     {
-                        <p class="hand fs-3 mb-1">@HolidayHeading()</p>
+                        <p class="hand mb-1">@HolidayHeading()</p>
                         <p class="fw-bold fs-5 mb-1">@holiday.Holiday.Name</p>
                         <p class="small mb-0">@holiday.Holiday.LocalName · public holiday in @location?.Country</p>
                     }
                     else
                     {
-                        <p class="hand fs-3 mb-1">Holidays</p>
+                        <p class="hand mb-1">Holidays</p>
                         <p class="small mb-0 text-muted-sb">@(holidayMessage ?? "No holiday found.")</p>
                     }
                 </div>
@@ -225,8 +225,8 @@
         @if (age != null)
         {
             <div class="col-md-7">
-                <div class="paper note-blue tilt-l h-100">
-                    <span class="pin"></span>
+                <div class="paper note tilt-l h-100">
+                 
                     <h3 class="mb-2"><i class="bi bi-person-heart"></i> Me, since then</h3>
                     <p class="mb-0">
                         Born on a <strong>@age.BornOnWeekday</strong>.
@@ -252,9 +252,9 @@
         {
             <div class="col-md-5">
                 <div class="paper tilt-r h-100">
-                    <span class="pin"></span>
+                 
                     <h3 class="mb-2"><i class="bi bi-geo-alt"></i> Where I was born</h3>
-                    <p class="mb-1"><span class="hl-city">@location.DisplayName</span></p>
+                    <p class="mb-1">@location.DisplayName</p>
                     <p class="small text-muted-sb mb-0">
                         @location.Latitude, @location.Longitude · @location.CountryCode
                     </p>
@@ -271,15 +271,15 @@
             @if (!string.IsNullOrEmpty(spacePicture.ImageUrl))
             {
                 <div class="col-lg-6">
-                    <div class="polaroid tape tilt-l">
+                    <div class="polaroid  tilt-l">
                         <img class="polaroid-large" src="@spacePicture.ImageUrl" alt="@spacePicture.Title" />
-                        <p class="hand fs-3 mb-0 mt-2">@spacePicture.Title</p>
+                        <p class="hand mb-0 mt-2">@spacePicture.Title</p>
                     </div>
                 </div>
             }
             <div class="col-lg-6">
-                <div class="paper lined tilt-r ps-4">
-                    <p class="hand fs-3 accent mb-1">@spacePicture.Title</p>
+                <div class="paper tilt-r ps-4">
+                    <p class="hand accent mb-1">@spacePicture.Title</p>
                     @if (spacePicture.IsVideo)
                     {
                         <p class="mb-2">
@@ -330,7 +330,7 @@
     @* history *@
     @if (!string.IsNullOrEmpty(historyError))
     {
-        <div class="paper note-pink mt-4"><i class="bi bi-exclamation-circle me-1"></i> @historyError</div>
+        <div class="paper note mt-4"><i class="bi bi-exclamation-circle me-1"></i> @historyError</div>
     }
 
     @if (history != null)
@@ -340,7 +340,7 @@
         @if (history.SameYearEvents.Count > 0)
         {
             <div class="cut-shadow mb-5">
-                <div class="paper note-green tilt-l">
+                <div class="paper note tilt-l">
                     <h3 class="mb-2">The year I was born (@birthDate.Year)</h3>
                     <ul class="mb-0">
                         @foreach (var e in history.SameYearEvents)

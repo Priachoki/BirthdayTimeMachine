@@ -138,7 +138,7 @@
             return;
         }
 
-        await Task.WhenAll(LoadTodaysSky(), LoadRecentFilm());
+        await Task.WhenAll(LoadYesterdaysSky(), LoadRecentFilm());
         StateHasChanged();
     }
 
