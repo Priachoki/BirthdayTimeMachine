@@ -1,6 +1,6 @@
-﻿using System.Net;
-using BirthdayTimeMachine.Models;
+﻿using BirthdayTimeMachine.Models;
 using BirthdayTimeMachine.Services;
+using System.Net;
 
 namespace BirthdayTimeMachine.Test
 {

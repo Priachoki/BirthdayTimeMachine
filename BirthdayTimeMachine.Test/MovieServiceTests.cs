@@ -1,7 +1,7 @@
-﻿using System.Net;
-using BirthdayTimeMachine.Models;
+﻿using BirthdayTimeMachine.Models;
 using BirthdayTimeMachine.Services;
 using Microsoft.Extensions.Configuration;
+using System.Net;
 
 namespace BirthdayTimeMachine.Test
 {
