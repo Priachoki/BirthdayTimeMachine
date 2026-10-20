@@ -17,8 +17,6 @@ The Birthday Time Machine lets you enter your name, the city you were born in an
 - NASA's picture with its explanation, films from that week, and history and famous birthdays (with a pop-up to see more)
 - Save your birthday pages to a JSON file, then search, sort and filter them
 
-![Birthday page](docs/birthday.png)
-![Saved pages](docs/saved.png)
 
 ## APIs I used
 
