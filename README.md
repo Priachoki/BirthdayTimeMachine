@@ -1,7 +1,5 @@
 # Birthday Time Machine
 
-**SOA – CA1** · [YOUR NAME] ([STUDENT NUMBER]) · [YOUR GITHUB REPO URL]
-
 For this assignment I wanted to make something a bit more interesting than a standard API demo. Instead of just showing data from one service, I liked the idea of showing what the world was like on the day somebody was born.
 
 The Birthday Time Machine lets you enter your name, the city you were born in and your birthday. The app then combines information from six web services (five different providers) and puts it all on one page. It shows the weather on the day, NASA's picture of the sky, films released around that time, historical events, famous birthdays and the closest public holiday. It also creates a short summary that brings all of the information together into a single sentence about your birthday.
